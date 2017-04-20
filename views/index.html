@@ -25,6 +25,7 @@
 	
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="https://unpkg.com/vue@2.2.6"></script>
+		<script src="javascript/bundle.js"></script>
 		<script>
 			var socket = io();
 			socket.on("message", function (message) { 
@@ -34,7 +35,7 @@
 			var vue = new Vue ({
 				el: '#app',
 				data: {
-					messages: [ { message: 'werwer' } ],
+					messages: [],
 				}
 			})
 
