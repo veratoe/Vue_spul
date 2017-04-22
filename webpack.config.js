@@ -1,14 +1,17 @@
 module.exports = {
-	entry: "./app/main.js",
+    entry: "./app/app.js",
 
 	module: {
 		loaders: [
-			// javascriptj
 			{
-				test: /\.js/,
+				test: /\.js$/,
 				exclude: /node_modules|server/,
 			    loader: 'babel-loader'		
-			}			
+			},
+            {
+                test: /\.vue$/,
+                loader: 'vue-loader'
+            }            
 		],
 	},
 

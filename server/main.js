@@ -10,7 +10,7 @@ var path = require('path');
 var stdin = process.stdin;
 
 app.get("/",  function(request, response) {
-	response.sendFile(path.resolve("views/index.html"));
+	response.sendFile(path.resolve("public/index.html"));
 });
 
 io.on('connection', function (socket) {
