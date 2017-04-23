@@ -1,12 +1,23 @@
-var s = require('sequelize');
-var p = new s('wub', 'chronos', '', {
+var Sequelize = require('sequelize');
+var sequelize = new Sequelize('wub', 'chronos', '', {
 	host: 'localhost',
-	dialect: 'postgres'
+	dialect: 'postgres',
+
+    pool: {
+        min: 0,
+        max: 5,
+        idle: 10
+    }
 });
+
+sequelize
+    .authenticate()
+    .then((errors) => { console.log('Postgres connection succesful'); })
+    .catch((errors) => { console.log('Errors on DB connection: ', errors); });
 
 module.exports = {
 
-	Sequelize: s,
-	sequelize: p,
+    Sequelize: Sequelize,
+	sequelize: sequelize
 	
 };

@@ -7,7 +7,5 @@ var Message = db.sequelize.define('message', {
 	}
 });
 
-Message.sync();
-
 module.exports = Message;
 

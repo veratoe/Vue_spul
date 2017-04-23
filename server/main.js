@@ -1,44 +1,18 @@
-var Message = require('./models/message');
-
 var express = require('express');
-var app = new express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var port = 3000;
+var app = express();
 var path = require('path');
+var bodyParser = require('body-parser');
 
-var stdin = process.stdin;
+var Message = require("./models/message");
 
-app.get("/",  function(request, response) {
-	response.sendFile(path.resolve("public/index.html"));
-});
-
-io.on('connection', function (socket) {
-	console.log('A user logged in');
-	socket.emit('message', 'Le happy welcome!');
-	socket.on("chat message", function (message) { 
-		Message.create({ message: message });
-		console.log('<<< Le message: ' + message); 
-	});
-
-	Message.findAll().then(function(messages) {
-		messages.forEach(function(m) {
-			socket.emit('message', m.get('message'));
-		});
-	});
-
-	stdin.on('data', function (key) {
-		console.log(">>>" + key);
-		socket.emit('message', String(key));
-	});
-	
-});
-
-
+// static files
 app.use(express.static('public'));
 
-http.listen(port, function(error) {
-	console.log('Lekker luisteren op port ', port);
-});
+// parsing request body for POST, PUT
+app.use(bodyParser.json());
 
+// routes
+app.use("/api", require("./routes"));
+
+app.listen(3000);
 
