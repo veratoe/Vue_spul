@@ -3,7 +3,8 @@ var app = express();
 var path = require('path');
 var bodyParser = require('body-parser');
 
-var Message = require("./models/message");
+// Load models. Dit moet handiger kunnen
+require("./models");
 
 // static files
 app.use(express.static('public'));
@@ -12,7 +13,7 @@ app.use(express.static('public'));
 app.use(bodyParser.json());
 
 // routes
-app.use("/api", require("./routes"));
+app.use("/api", require("./router"));
 
 app.listen(3000);
 
