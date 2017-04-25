@@ -1,3 +1,5 @@
-//require("./thread.js");
-//require("./message.js");
-module.exports = {};
+module.exports = {
+    Message:require("./message.js"),
+    Thread: require("./thread.js"),
+};
+

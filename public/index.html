@@ -9,17 +9,7 @@
 		<div id="app">
 		</div>
 	
-        <div id="data" style="font-size: 12px; font-family: monospace">
-            <ul>
-            </ul> 
-        </div>
-
 		<script src="javascript/bundle.js"></script>
 
-        <script>
-            $.ajax({ url: "/api/messages", success: function (data) {
-                data.forEach((m) => { $("<li>" + m.message + "</li>").appendTo($("#data ul")); });
-            }});
-        </script>
 	</body>
 </html>

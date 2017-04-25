@@ -7,7 +7,7 @@ Vue.use(Vuex);
 
 const state = {
     threads: [],
-    activeNote: {}
+    activeThreadId: null,
 };
 
 

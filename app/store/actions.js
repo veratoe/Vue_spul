@@ -1,9 +1,18 @@
 // hier komt de API? 
 
 export const fetchThreads = ({ commit }) => {
-    commit("FETCH_THREADS", [ 
-        { id: 0, title: "LE dongster" },
-        { id: 1, title: "Ze wingwong" } 
-    ]);
+
+    $.ajax({ 
+        url: "api/threads", 
+        type: "GET", 
+        success: function (data, textStatus, jqXHR) {
+            console.log(data);
+            commit("SET_THREADS", data.threads);
+        }
+    });
+};
+
+export const setActiveThreadId = ({ commit }, id) => {
+    commit("SET_ACTIVE_THREAD_ID", id); 
 };
 

@@ -3,14 +3,15 @@ var router = require("../router.js");
 
 // define model
 var Thread = module.exports = db.sequelize.define("thread", {
-	thread: {
-		type: db.Sequelize.STRING,
-		field: "title"
-	}
+    title: db.Sequelize.STRING,
 });
 
+var Message = require("./message");
+
 console.log('thread.js: de router: ', router);
-//Thread.hasMany(Message);
+console.log('thread.js: Message: ', Message);
+
+Thread.hasMany(Message);
 Thread.sync();
 
 // routes
@@ -18,7 +19,7 @@ router.get("/threads", (req, res) => {
 
     Thread.findAll({ include: [ Message ] })
         .then(threads => {
-            res.json(threads);
+            res.json({ threads: threads });
         })
         .catch(e => { 
             throw e; 
@@ -26,8 +27,6 @@ router.get("/threads", (req, res) => {
 });
 
 router.post("/threads", (req, res) => {
-
-    console.log('creating thread');
 
     Thread.create({
         title: req.body.title
