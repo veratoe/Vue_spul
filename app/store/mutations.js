@@ -1,11 +1,20 @@
+import getters from "./getters.js";
+
 export default  {
 
-    SET_THREADS (state, threads) {
+    RECEIVE_THREADS (state, threads) {
         state.threads = threads;
+    },
+    RECEIVE_THREAD (state, thread) {
+        state.threads.push(thread);
     },
 
     SET_ACTIVE_THREAD_ID (state, threadId) {
         state.activeThreadId = threadId; 
+    },
+
+    RECEIVE_MESSAGE (state, message) {
+        getters.getActiveThread(state).messages.push(message);
     }
 };
 

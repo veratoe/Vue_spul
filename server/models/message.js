@@ -27,7 +27,6 @@ router.get("/threads/:id/messages", (req, res) => {
 
 router.post("/threads/:id/messages", (req, res) => {
 
-
     var t = Thread.findById(req.params.id)
         .then(thread => {
             if (!thread) {  
@@ -39,13 +38,11 @@ router.post("/threads/:id/messages", (req, res) => {
             console.log('creating message on thread %s => %s', req.params.id, req.body.message);
             var m = Message.create({ message: req.body.message })
                 .then(m => {
-
-            console.log("created message: ", m);
-            thread.addMessages(m)
-                console.log("Saved message ", m.get("id"));
-                res.status(200).send();
-            });
+                    console.log("created message: ", m);
+                    thread.addMessages(m);
+                    console.log("Saved message ", m.get("id"));
+                    res.status(200).json(m);
+                });
         });
-
 
 });

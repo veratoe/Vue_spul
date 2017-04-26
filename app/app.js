@@ -1,13 +1,16 @@
 import Vue from     "./lib/vue.js";
 import Vuex from    "./lib/vuex.min.js";
-import App from     "./components/App.vue";
+
+import app from     "./components/app.vue";
 import store from   "./store/store.js";
-import * as actions from  "./store/actions.js";
+import actions from  "./store/actions.js";
+
+require('./css/app.less');
 
 new Vue ({
     el: "#app",
     store,
-    render: h => h(App)
+    render: h => h(app)
 });
 
 actions.fetchThreads(store);   

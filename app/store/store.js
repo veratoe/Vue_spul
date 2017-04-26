@@ -1,7 +1,8 @@
 import Vue from "../lib/vue.js";
 import Vuex from "../lib/vuex.min.js";
 import mutations from "./mutations.js";
-import * as actions from "./actions.js";
+import getters from "./getters.js";
+import actions from "./actions.js";
 
 Vue.use(Vuex);
 
@@ -13,6 +14,7 @@ const state = {
 
 export default new Vuex.Store({
     state,
+    getters,
     mutations,
-    actions
+    actions,
 });

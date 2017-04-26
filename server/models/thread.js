@@ -32,8 +32,8 @@ router.post("/threads", (req, res) => {
         title: req.body.title
     })
     .then(thread => {
-        console.log("Saved thread ", thread.get("id"));
-        res.status(200).send();
+        thread.messages = [];
+        res.status(200).json(thread);
     });
 
 });
