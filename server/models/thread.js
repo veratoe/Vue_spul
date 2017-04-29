@@ -7,6 +7,7 @@ var Thread = module.exports = db.sequelize.define("thread", {
 
 var router = require("../router.js");
 var Message = require("./message");
+var Script = require("./script");
 
 Thread.hasMany(Message);
 Thread.sync();
@@ -14,7 +15,7 @@ Thread.sync();
 // routes
 router.get("/threads", (req, res) => {
 
-    Thread.findAll({ include: [ Message ] })
+    Thread.findAll({ include: [ Message, Script ] })
         .then(threads => {
             res.json({ threads: threads });
         })
