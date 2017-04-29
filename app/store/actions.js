@@ -28,16 +28,39 @@ export default {
         });
 
     },
+
+    /*
+     * Creeer een draad
+     * @param payload: draad object
+     */    
     
     createThread ({ commit, state }, payload) {
 
         $.ajax({
             url: "api/threads/",
             type: "POST",
-            data: JSON.stringify({ title: payload }),
+            data: JSON.stringify(payload),
             contentType: "application/json",
             success: (thread) => {
+                thread.messages = []; // @APPELMOES: is dit goed?
                 commit("RECEIVE_THREAD", thread);
+            }
+        });
+    },
+
+    /*
+     * Delete een draad
+     * @param payload: threadId
+     */    
+
+    deleteThread ({ commit, state } , payload) {
+        
+        $.ajax({
+            url: "api/threads/" + payload,
+            type: "DELETE",
+            success: () => {
+                commit("DELETE_THREAD", payload); 
+                commit("SET_ACTIVE_THREAD_ID", null);
             }
         });
     }

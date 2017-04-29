@@ -8,6 +8,9 @@ export default  {
     RECEIVE_THREAD (state, thread) {
         state.threads.push(thread);
     },
+    DELETE_THREAD (state, thread) {
+        getters.deleteThread(state, thread);
+    },
 
     SET_ACTIVE_THREAD_ID (state, threadId) {
         state.activeThreadId = threadId; 

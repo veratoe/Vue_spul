@@ -13,7 +13,9 @@
 
     export default {
         name: "MessageView",
-        props: { message: Object }
+        props: { message: Object },
+        created () {
+        }
     }
 
 </script>

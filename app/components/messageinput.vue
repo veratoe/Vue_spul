@@ -22,6 +22,8 @@
                 this.$store.dispatch('sendMessage', this.text); 
                 this.text = null
             }
+        },
+        created () {
         }
     }
 

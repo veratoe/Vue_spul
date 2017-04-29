@@ -14,7 +14,7 @@ app.use(express.static('public'));
 // routes
 app.use("/api", require("./router"));
 
-// Load models. Dit moet handiger kunnen
+// Load models
 require("./models");
 
 app.listen(3000);

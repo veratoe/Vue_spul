@@ -10,6 +10,7 @@ module.exports = {
 			},
             {
                 test: /\.vue$/,
+				exclude: /node_modules|server/,
                 loader: 'vue-loader'
             },            
             {

@@ -33,7 +33,7 @@
                 this.$store.dispatch('setActiveThreadId', id);
             },
             createThread () {
-                this.$store.dispatch('createThread', this.title);
+                this.$store.dispatch('createThread', { title: this.title });
             }
         },
 
