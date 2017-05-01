@@ -9,8 +9,10 @@
             </div>
         </div>
     
-        <MessagesView v-if="subView == 'messages'" :messages="thread.messages"></MessagesView>
-        <ScriptsView v-if="subView == 'scripts'" :scripts="thread.scripts"></ScriptsView>
+        <div class="sub_view">
+            <MessagesView v-if="subView == 'messages'" :messages="thread.messages"></MessagesView>
+            <ScriptsView v-if="subView == 'scripts'" :scripts="thread.scripts"></ScriptsView>
+        </div>
     </div>
 
 </template>
@@ -42,32 +44,43 @@
 
 <style lang="less">
 
-    .header {
-        .title {
-            font-size: 32px;
-            color: #888;
-        }
-
-        .tabs {
-            float: right;
-
-            .tab {
-                cursor: pointer;
-                &:hover { color: blue }
-                &.selected { text-decoration: underline }
-            }
-        }
-        
-    }
     .thread_view {
+
         width: 75%;
         padding: 20px;
+        display: flex;
+        flex-direction: column;
 
-        .delete_thread {
-            cursor: pointer;
-            &:hover {
-                color: red;
+        .header {
+            flex: 0 0 50px;
+
+            .title {
+                font-size: 32px;
+                color: #888;
             }
+
+            .delete_thread {
+                cursor: pointer;
+                &:hover {
+                    color: red;
+                }
+            }
+
+            .tabs {
+                float: right;
+
+                .tab {
+                    cursor: pointer;
+                    &:hover { color: blue }
+                    &.selected { text-decoration: underline }
+                }
+            }
+            
+        }
+
+        .sub_view {
+            flex: 1 1 0;
+        
         }
 
     }

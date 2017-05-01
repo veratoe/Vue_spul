@@ -15,7 +15,7 @@ router.get("/threads/:id/messages", (req, res) => {
 
     Thread.findById(req.params.id, { include: [ Message ] })
         .then(thread => {
-            res.status(200).json(thread);
+            res.status(200).json(thread.messages);
         });
 });
 

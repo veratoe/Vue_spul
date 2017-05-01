@@ -18,6 +18,11 @@ export default  {
 
     RECEIVE_MESSAGE (state, message) {
         getters.getActiveThread(state).messages.push(message);
+    },
+
+    UPDATE_SCRIPT (state, script) {
+        var index = getters.getActiveThread(state).scripts.findIndex(s => s.id === script.id);
+        console.log(index);
     }
 };
 

@@ -16,7 +16,24 @@ Script.sync();
 
 // routes
 
-router.post("threads/:id/scripts", (req, res) => {
+router.put("/threads/:thread_id/scripts/:id", (req, res) => {
+
+    Script.findById(req.params.id)
+        .then(script => {
+            if (!script) {
+                res.status(400).send()
+                return;
+            }
+            
+            script.update({ script: req.body.script })
+                .then(s => {
+                    res.status(200).json(s);
+                });
+        });
+
+});
+
+router.post("/threads/:id/scripts", (req, res) => {
 
     Thread.findById(req.params.id)
         .then(thread => {
@@ -34,7 +51,8 @@ router.post("threads/:id/scripts", (req, res) => {
 
 });
 
-router.delete("threads/:thread_id/scripts/:script_id", (req, res) => {
+
+router.delete("/threads/:thread_id/scripts/:script_id", (req, res) => {
 
     Script.findById(req.params.script_id)
         .then(s => {

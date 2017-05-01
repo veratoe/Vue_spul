@@ -1,5 +1,6 @@
 export default {
     
+    // @APPELMOES: Ajax spul naar api.js
     fetchThreads ({ commit }) {
 
         $.ajax({ 
@@ -27,6 +28,10 @@ export default {
             }
         });
 
+    },
+
+    addMessage ({ commit, state }, payload) {
+        commit("RECEIVE_MESSAGE", payload);
     },
 
     /*
@@ -61,6 +66,20 @@ export default {
             success: () => {
                 commit("DELETE_THREAD", payload); 
                 commit("SET_ACTIVE_THREAD_ID", null);
+            }
+        });
+    },
+
+    saveScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload.id,
+            type: "PUT",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success (script) {
+                alert('le updatan');
+                commit("UPDATE_SCRIPT", script); 
             }
         });
     }
