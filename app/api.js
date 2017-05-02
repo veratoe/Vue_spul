@@ -4,6 +4,9 @@ import actions from "./store/actions.js";
 
 setInterval(() =>{
     
+    if (!store.state.activeThreadId)
+        return;
+
     $.ajax({  
 
         url: "api/threads/" + store.state.activeThreadId + "/messages",
@@ -11,8 +14,6 @@ setInterval(() =>{
         contentType: "application/json",
         success: (messages) => {
             var thread = getters.getActiveThread(store.state);
-            console.log(thread);
-            console.log(messages);
             if (!messages) return;
             messages.forEach((message) => {
                 if (!thread.messages.find(m => m.id == message.id)) {  
@@ -22,4 +23,19 @@ setInterval(() =>{
         }
 
     });
+
+    $.ajax({
+    
+        url: "api/threads/" + store.state.activeThreadId + "/scripts",
+        type: "GET",
+        contentType: "application/json",
+        success: (scripts) => {
+            if (!scripts) return;
+            scripts.forEach((script) => {
+                store.dispatch('receiveScript', script);
+            });
+                    
+        }
+    });
+
 }, 1000);

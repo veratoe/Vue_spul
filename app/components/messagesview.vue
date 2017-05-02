@@ -22,7 +22,9 @@
         props: { messages: Array },
         methods: {
             scrollToBottom () {
-                $(".messages").animate({ scrollTop: $(".messages")[0].scrollHeight });
+                var $messages = $(".messages");
+                if ($messages.length)
+                $messages.animate({ scrollTop: $messages[0].scrollHeight });
             }
         },
         created () {

@@ -1,9 +1,14 @@
 <template>
 
     <div class="script_view">
-        <span class="id">{{ script.id }}</span> | <span class="created_at">created: {{ script.createdAt }}</span>
+        <div class="header">
+            <span class="id">{{ script.id }}</span> | <span class="created_at">created: {{ script.createdAt }}</span> | <span> runs_left: {{ script.runs_left }} </span> <strong v-if="script.active" class="status">ACTIEF</strong><strong v-else>INACTIEF</strong>
+        </div>
         <textarea class="script" v-model="script.script" />
-        <button @click="saveScript">Opslaan</button>
+        <div cass="controls">
+            <button @click="saveScript">Opslaan</button>
+            <button @click="deleteScript">Wissen</button>
+        </div>
     </div>
     
 </template>
@@ -14,8 +19,10 @@
         props: { script: Object },
         methods: {
             saveScript () {
-                console.log("script: ", this.script);
                 this.$store.dispatch('saveScript', this.script); 
+            },
+            deleteScript() {
+                this.$store.dispatch('deleteScript', this.script.id); 
             }
         }
     }
@@ -26,6 +33,15 @@
 
     .script_view {
         
+        .header {
+            background: #eee;
+            padding: 5px;
+
+            .status {
+                color: green;
+            }
+        }
+
         textarea {
             width: 80%;
             resize: none;

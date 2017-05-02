@@ -7,7 +7,8 @@ var sequelize = new Sequelize('wub', 'chronos', '', {
         min: 0,
         max: 5,
         idle: 10
-    }
+    },
+    logging: false
 });
 
 sequelize

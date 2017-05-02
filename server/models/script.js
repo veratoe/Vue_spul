@@ -3,7 +3,8 @@ var db = require("../db.js");
 // define model;
 var Script = module.exports = db.sequelize.define("script", {
     script: db.Sequelize.STRING(1024),
-    active: db.Sequelize.BOOLEAN
+    active: db.Sequelize.BOOLEAN,
+    runs_left: db.Sequelize.INTEGER
 }); 
 
 var Thread = require("./thread.js");
@@ -15,6 +16,14 @@ Thread.hasMany(Script);
 Script.sync();
 
 // routes
+
+router.get("/threads/:id/scripts/", (req, res) => {
+
+    Script.findAll({ where: { threadId : req.params.id }})
+        .then(scripts => {
+            res.status(200).json(scripts);
+        });
+});
 
 router.put("/threads/:thread_id/scripts/:id", (req, res) => {
 
@@ -42,11 +51,15 @@ router.post("/threads/:id/scripts", (req, res) => {
                 return;
             }
             
-            Script.create({ script: req.body.script, threadId: thread.get("id") })
-                .then(s => {
-                    res.status(200).json(s);
-
-                });
+            Script.create({ 
+                script: req.body.script, 
+                threadId: thread.get("id"),
+                runs_left: 10,
+                active: true
+            })
+            .then(s => {
+                res.status(200).json(s);
+            });
         });
 
 });
@@ -66,18 +79,34 @@ Script.Instance.prototype.run = function (message, threadId) {
 
     var {VM} = require('vm2');
     var vm = new VM({
+        timeout: 10,
         sandbox: {
             Promise: null,
             require: null,
             input: message.get("message"),
-            timeout: 10,
+            inputId: message.get("id"),
         }
     });
 
-    vm.run(this.get("script"));
-
-    if (vm._context.output) {
-        Message.create({ message: vm._context.output, threadId: threadId });
+    console.log('running script %s', this.get("id"));
+    try {
+        vm.run(this.get("script"));
+        this.decrement('runs_left', { by: 1 });
+        console.log('done');
+    } catch (err) {
+        console.log('error on script %s : %s, deactivating', this.get("id"), err);
+        this.update({ active: false });
     }
+
+    
+    if (vm._context.output) {
+    }
+    //    console.log(vm._context.output);
+    //    var output = vm._context.output.substring(0, 139);
+    //    Message.build({ message: output, threadId: threadId }) .save()
+    //        .then(() => { console.log('message added'); })
+    //        .catch((err) => { console.log(err) });
+    //}
+    //
 
 }

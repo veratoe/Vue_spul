@@ -48,7 +48,7 @@ export default {
             contentType: "application/json",
             success: (thread) => {
                 thread.messages = []; // @APPELMOES: is dit goed?
-                commit("RECEIVE_THREAD", thread);
+                commit("CREATE_THREAD", thread);
             }
         });
     },
@@ -70,6 +70,18 @@ export default {
         });
     },
 
+    createScript({ commit, state }) {
+        
+        $.ajax({
+
+            url: "api/threads/" + state.activeThreadId + "/scripts/",
+            type: "POST",
+            success (script) {
+                commit("CREATE_SCRIPT", script); 
+            }
+        });
+    },
+        
     saveScript({ commit, state }, payload) {
 
         $.ajax({
@@ -78,8 +90,28 @@ export default {
             data: JSON.stringify(payload),
             contentType: "application/json",
             success (script) {
-                alert('le updatan');
                 commit("UPDATE_SCRIPT", script); 
+            }
+        });
+    },
+
+    receiveScript({ commit, state }, payload) {
+        commit("UPDATE_SCRIPT", payload);
+    },
+
+    /*
+     * Delete een draad
+     * @param payload: scriptId
+     */    
+    
+    deleteScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload,
+            type: "DELETE",
+            contentType: "application/json",
+            success () {
+                commit("DELETE_SCRIPT", payload); 
             }
         });
     }

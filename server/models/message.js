@@ -32,8 +32,7 @@ router.post("/threads/:id/messages", (req, res) => {
                 .then(m => {
                     res.status(200).json(m);
 
-                    var scripts = thread.getScripts().then(scripts => {
-
+                    var scripts = thread.getScripts({ where: { runs_left: { $gt: 0 }, active: true }}).then(scripts => {
                         scripts.forEach((script, index) => {
                             script.run(m, req.params.id);                            
                         });

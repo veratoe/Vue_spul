@@ -5,11 +5,12 @@ export default  {
     RECEIVE_THREADS (state, threads) {
         state.threads = threads;
     },
-    RECEIVE_THREAD (state, thread) {
+    CREATE_THREAD (state, thread) {
         state.threads.push(thread);
     },
-    DELETE_THREAD (state, thread) {
-        getters.deleteThread(state, thread);
+    DELETE_THREAD (state, threadId) {
+        var index = state.threads.findIndex(t => t.id === threadId);
+        state.threads.splice(index, 1);
     },
 
     SET_ACTIVE_THREAD_ID (state, threadId) {
@@ -20,9 +21,22 @@ export default  {
         getters.getActiveThread(state).messages.push(message);
     },
 
+    CREATE_SCRIPT (state, script) {
+        var thread = getters.getActiveThread(state);
+        thread.scripts.push(script);
+    },
+
     UPDATE_SCRIPT (state, script) {
-        var index = getters.getActiveThread(state).scripts.findIndex(s => s.id === script.id);
-        console.log(index);
+        var thread = getters.getActiveThread(state);
+        var index = thread.scripts.findIndex(s => s.id === script.id);
+        thread.scripts[index] = script;
+        
+    },
+
+    DELETE_SCRIPT (state, scriptId) {
+        var thread = getters.getActiveThread(state);
+        var index = thread.scripts.findIndex(s => s.id === scriptId);
+        thread.scripts.splice(index, 1);
     }
 };
 

@@ -457,22 +457,19 @@ function applyToTag (styleElement, obj) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony default export */ __webpack_exports__["a"] = ({
+const getters = {
 
     getActiveThread: state => {
         return state.threads.find(t => t.id === state.activeThreadId);
     },
 
     // @APPELMOES: niet echt een getter lijkt me
-    deleteThread: (state, threadId) => {
-        state.threads.forEach((t, index) => {
-            if (t.id === threadId) {
-                state.threads.splice(index, 1);
-                return;
-            }
-        });
-    }
-});
+
+    // @APPELMOES: niet echt een getter lijkt me
+    getScript: (state, scriptId) => {}
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (getters);
 
 /***/ }),
 /* 4 */
@@ -528,7 +525,7 @@ function applyToTag (styleElement, obj) {
             contentType: "application/json",
             success: thread => {
                 thread.messages = []; // @APPELMOES: is dit goed?
-                commit("RECEIVE_THREAD", thread);
+                commit("CREATE_THREAD", thread);
             }
         });
     },
@@ -550,6 +547,18 @@ function applyToTag (styleElement, obj) {
         });
     },
 
+    createScript({ commit, state }) {
+
+        $.ajax({
+
+            url: "api/threads/" + state.activeThreadId + "/scripts/",
+            type: "POST",
+            success(script) {
+                commit("CREATE_SCRIPT", script);
+            }
+        });
+    },
+
     saveScript({ commit, state }, payload) {
 
         $.ajax({
@@ -558,8 +567,28 @@ function applyToTag (styleElement, obj) {
             data: JSON.stringify(payload),
             contentType: "application/json",
             success(script) {
-                alert('le updatan');
                 commit("UPDATE_SCRIPT", script);
+            }
+        });
+    },
+
+    receiveScript({ commit, state }, payload) {
+        commit("UPDATE_SCRIPT", payload);
+    },
+
+    /*
+     * Delete een draad
+     * @param payload: scriptId
+     */
+
+    deleteScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload,
+            type: "DELETE",
+            contentType: "application/json",
+            success() {
+                commit("DELETE_SCRIPT", payload);
             }
         });
     }
@@ -9494,6 +9523,8 @@ module.exports = g;
 
 setInterval(() => {
 
+    if (!__WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.activeThreadId) return;
+
     $.ajax({
 
         url: "api/threads/" + __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.activeThreadId + "/messages",
@@ -9501,8 +9532,6 @@ setInterval(() => {
         contentType: "application/json",
         success: messages => {
             var thread = __WEBPACK_IMPORTED_MODULE_1__store_getters_js__["a" /* default */].getActiveThread(__WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state);
-            console.log(thread);
-            console.log(messages);
             if (!messages) return;
             messages.forEach(message => {
                 if (!thread.messages.find(m => m.id == message.id)) {
@@ -9511,6 +9540,19 @@ setInterval(() => {
             });
         }
 
+    });
+
+    $.ajax({
+
+        url: "api/threads/" + __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.activeThreadId + "/scripts",
+        type: "GET",
+        contentType: "application/json",
+        success: scripts => {
+            if (!scripts) return;
+            scripts.forEach(script => {
+                __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].dispatch('receiveScript', script);
+            });
+        }
     });
 }, 1000);
 
@@ -9624,11 +9666,12 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
     RECEIVE_THREADS(state, threads) {
         state.threads = threads;
     },
-    RECEIVE_THREAD(state, thread) {
+    CREATE_THREAD(state, thread) {
         state.threads.push(thread);
     },
-    DELETE_THREAD(state, thread) {
-        __WEBPACK_IMPORTED_MODULE_0__getters_js__["a" /* default */].deleteThread(state, thread);
+    DELETE_THREAD(state, threadId) {
+        var index = state.threads.findIndex(t => t.id === threadId);
+        state.threads.splice(index, 1);
     },
 
     SET_ACTIVE_THREAD_ID(state, threadId) {
@@ -9639,9 +9682,21 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
         __WEBPACK_IMPORTED_MODULE_0__getters_js__["a" /* default */].getActiveThread(state).messages.push(message);
     },
 
+    CREATE_SCRIPT(state, script) {
+        var thread = __WEBPACK_IMPORTED_MODULE_0__getters_js__["a" /* default */].getActiveThread(state);
+        thread.scripts.push(script);
+    },
+
     UPDATE_SCRIPT(state, script) {
-        var index = __WEBPACK_IMPORTED_MODULE_0__getters_js__["a" /* default */].getActiveThread(state).scripts.findIndex(s => s.id === script.id);
-        console.log(index);
+        var thread = __WEBPACK_IMPORTED_MODULE_0__getters_js__["a" /* default */].getActiveThread(state);
+        var index = thread.scripts.findIndex(s => s.id === script.id);
+        thread.scripts[index] = script;
+    },
+
+    DELETE_SCRIPT(state, scriptId) {
+        var thread = __WEBPACK_IMPORTED_MODULE_0__getters_js__["a" /* default */].getActiveThread(state);
+        var index = thread.scripts.findIndex(s => s.id === scriptId);
+        thread.scripts.splice(index, 1);
     }
 });
 
@@ -9748,7 +9803,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     props: { messages: Array },
     methods: {
         scrollToBottom() {
-            $(".messages").animate({ scrollTop: $(".messages")[0].scrollHeight });
+            var $messages = $(".messages");
+            if ($messages.length) $messages.animate({ scrollTop: $messages[0].scrollHeight });
         }
     },
     created() {
@@ -9777,6 +9833,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 
 
@@ -9787,7 +9846,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     props: {
         scripts: Array
     },
-    methods: {}
+    methods: {
+        createScript() {
+            this.$store.dispatch('createScript');
+        }
+    }
 });
 
 /***/ }),
@@ -9806,14 +9869,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: { script: Object },
     methods: {
         saveScript() {
-            console.log("script: ", this.script);
             this.$store.dispatch('saveScript', this.script);
+        },
+        deleteScript() {
+            this.$store.dispatch('deleteScript', this.script.id);
         }
     }
 });
@@ -11877,7 +11947,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "", ""]);
+exports.push([module.i, "\n.controls[data-v-5cb622b4] {\n  margin-top: 20px;\n}\n", ""]);
 
 // exports
 
@@ -11905,7 +11975,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.script_view textarea {\n  width: 80%;\n  resize: none;\n  height: 90px;\n  padding: 20px;\n}\n", ""]);
+exports.push([module.i, "\n.script_view .header {\n  background: #eee;\n  padding: 5px;\n}\n.script_view .header .status {\n  color: green;\n}\n.script_view textarea {\n  width: 80%;\n  resize: none;\n  height: 90px;\n  padding: 20px;\n}\n", ""]);
 
 // exports
 
@@ -12535,7 +12605,7 @@ var Component = __webpack_require__(1)(
   /* styles */
   injectStyle,
   /* scopeId */
-  null,
+  "data-v-5cb622b4",
   /* moduleIdentifier (server only) */
   null
 )
@@ -12733,14 +12803,20 @@ if (false) {
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "scripts_view"
-  }, _vm._l((_vm.scripts), function(script) {
+  }, [_vm._l((_vm.scripts), function(script) {
     return _c('ScriptView', {
       key: script.id,
       attrs: {
         "script": script
       }
     })
-  }))
+  }), _vm._v(" "), _c('div', {
+    staticClass: "controls"
+  }, [_c('button', {
+    on: {
+      "click": _vm.createScript
+    }
+  }, [_vm._v("Nieuw script")])])], 2)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -12799,11 +12875,15 @@ if (false) {
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "script_view"
+  }, [_c('div', {
+    staticClass: "header"
   }, [_c('span', {
     staticClass: "id"
   }, [_vm._v(_vm._s(_vm.script.id))]), _vm._v(" | "), _c('span', {
     staticClass: "created_at"
-  }, [_vm._v("created: " + _vm._s(_vm.script.createdAt))]), _vm._v(" "), _c('textarea', {
+  }, [_vm._v("created: " + _vm._s(_vm.script.createdAt))]), _vm._v(" | "), _c('span', [_vm._v(" runs_left: " + _vm._s(_vm.script.runs_left) + " ")]), _vm._v(" "), (_vm.script.active) ? _c('strong', {
+    staticClass: "status"
+  }, [_vm._v("ACTIEF")]) : _c('strong', [_vm._v("INACTIEF")])]), _vm._v(" "), _c('textarea', {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -12820,11 +12900,19 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.script.script = $event.target.value
       }
     }
-  }), _vm._v(" "), _c('button', {
+  }), _vm._v(" "), _c('div', {
+    attrs: {
+      "cass": "controls"
+    }
+  }, [_c('button', {
     on: {
       "click": _vm.saveScript
     }
-  }, [_vm._v("Opslaan")])])
+  }, [_vm._v("Opslaan")]), _vm._v(" "), _c('button', {
+    on: {
+      "click": _vm.deleteScript
+    }
+  }, [_vm._v("Wissen")])])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -13011,13 +13099,13 @@ var content = __webpack_require__(25);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(2)("bf9c57bc", content, false);
+var update = __webpack_require__(2)("23208ab9", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
  if(!content.locals) {
-   module.hot.accept("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5cb622b4\",\"scoped\":false,\"hasInlineConfig\":false}!../../node_modules/less-loader/dist/index.js!../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./scriptsview.vue", function() {
-     var newContent = require("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5cb622b4\",\"scoped\":false,\"hasInlineConfig\":false}!../../node_modules/less-loader/dist/index.js!../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./scriptsview.vue");
+   module.hot.accept("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5cb622b4\",\"scoped\":true,\"hasInlineConfig\":false}!../../node_modules/less-loader/dist/index.js!../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./scriptsview.vue", function() {
+     var newContent = require("!!../../node_modules/css-loader/index.js!../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-5cb622b4\",\"scoped\":true,\"hasInlineConfig\":false}!../../node_modules/less-loader/dist/index.js!../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./scriptsview.vue");
      if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
      update(newContent);
    });
