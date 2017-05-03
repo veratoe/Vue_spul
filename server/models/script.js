@@ -1,14 +1,30 @@
 var db = require("../db.js");
 
 // define model;
-var Script = module.exports = db.sequelize.define("script", {
-    script: db.Sequelize.STRING(1024),
-    active: db.Sequelize.BOOLEAN,
-    runs_left: db.Sequelize.INTEGER
-}); 
+var Script = module.exports = db.sequelize.define("script", 
+    {
+        script: db.Sequelize.STRING(1024),
+        active: db.Sequelize.BOOLEAN,
+        runs_left: db.Sequelize.INTEGER
+    }, 
+    {
+        hooks: {
+            afterUpdate (instance, options, fn) {
+                console.log(instance);
+                Mutation.create({ 
+                    type: "UPDATE_SCRIPT",
+                    values: instance.dataValues,
+                    previousValues: instance._previousValues,
+                    changed: instance._changed
+                });
+            },
+        }
+    }
+); 
 
 var Thread = require("./thread.js");
 var Message = require("./message.js");
+var Mutation = require("./mutation.js");
 var router = require("../router.js");
 
 Thread.hasMany(Script);
@@ -75,6 +91,10 @@ router.delete("/threads/:thread_id/scripts/:script_id", (req, res) => {
         });
 });
 
+// hooks
+//
+    //
+// instance methods
 Script.Instance.prototype.run = function (message, threadId) {
 
     var {VM} = require('vm2');
@@ -91,7 +111,8 @@ Script.Instance.prototype.run = function (message, threadId) {
     console.log('running script %s', this.get("id"));
     try {
         vm.run(this.get("script"));
-        this.decrement('runs_left', { by: 1 });
+        this.update({ 'runs_left': this.runs_left - 1 });
+        console.log("runs_left: %s", this.runs_left);
         console.log('done');
     } catch (err) {
         console.log('error on script %s : %s, deactivating', this.get("id"), err);

@@ -454,148 +454,6 @@ function applyToTag (styleElement, obj) {
 
 /***/ }),
 /* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-const getters = {
-
-    getActiveThread: state => {
-        return state.threads.find(t => t.id === state.activeThreadId);
-    },
-
-    // @APPELMOES: niet echt een getter lijkt me
-
-    // @APPELMOES: niet echt een getter lijkt me
-    getScript: (state, scriptId) => {}
-};
-
-/* harmony default export */ __webpack_exports__["a"] = (getters);
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony default export */ __webpack_exports__["a"] = ({
-
-    // @APPELMOES: Ajax spul naar api.js
-    fetchThreads({ commit }) {
-
-        $.ajax({
-            url: "api/threads",
-            type: "GET",
-            success: function (data, textStatus, jqXHR) {
-                commit("RECEIVE_THREADS", data.threads);
-            }
-        });
-    },
-
-    setActiveThreadId({ commit }, payload) {
-        commit("SET_ACTIVE_THREAD_ID", payload);
-    },
-
-    sendMessage({ commit, state }, payload) {
-
-        $.ajax({
-            url: "api/threads/" + state.activeThreadId + "/messages",
-            type: "POST",
-            data: JSON.stringify({ message: payload }),
-            contentType: "application/json",
-            success: message => {
-                commit("RECEIVE_MESSAGE", message);
-            }
-        });
-    },
-
-    addMessage({ commit, state }, payload) {
-        commit("RECEIVE_MESSAGE", payload);
-    },
-
-    /*
-     * Creeer een draad
-     * @param payload: draad object
-     */
-
-    createThread({ commit, state }, payload) {
-
-        $.ajax({
-            url: "api/threads/",
-            type: "POST",
-            data: JSON.stringify(payload),
-            contentType: "application/json",
-            success: thread => {
-                thread.messages = []; // @APPELMOES: is dit goed?
-                commit("CREATE_THREAD", thread);
-            }
-        });
-    },
-
-    /*
-     * Delete een draad
-     * @param payload: threadId
-     */
-
-    deleteThread({ commit, state }, payload) {
-
-        $.ajax({
-            url: "api/threads/" + payload,
-            type: "DELETE",
-            success: () => {
-                commit("DELETE_THREAD", payload);
-                commit("SET_ACTIVE_THREAD_ID", null);
-            }
-        });
-    },
-
-    createScript({ commit, state }) {
-
-        $.ajax({
-
-            url: "api/threads/" + state.activeThreadId + "/scripts/",
-            type: "POST",
-            success(script) {
-                commit("CREATE_SCRIPT", script);
-            }
-        });
-    },
-
-    saveScript({ commit, state }, payload) {
-
-        $.ajax({
-            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload.id,
-            type: "PUT",
-            data: JSON.stringify(payload),
-            contentType: "application/json",
-            success(script) {
-                commit("UPDATE_SCRIPT", script);
-            }
-        });
-    },
-
-    receiveScript({ commit, state }, payload) {
-        commit("UPDATE_SCRIPT", payload);
-    },
-
-    /*
-     * Delete een draad
-     * @param payload: scriptId
-     */
-
-    deleteScript({ commit, state }, payload) {
-
-        $.ajax({
-            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload,
-            type: "DELETE",
-            contentType: "application/json",
-            success() {
-                commit("DELETE_SCRIPT", payload);
-            }
-        });
-    }
-});
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -9166,17 +9024,155 @@ const getters = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+const getters = {
+
+    getActiveThread: state => {
+        return state.threads.find(t => t.id === state.activeThreadId);
+    }
+
+};
+
+/* harmony default export */ __webpack_exports__["a"] = (getters);
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony default export */ __webpack_exports__["a"] = ({
+
+    // @APPELMOES: Ajax spul naar api.js
+    fetchThreads({ commit }) {
+
+        $.ajax({
+            url: "api/threads",
+            type: "GET",
+            success: function (data, textStatus, jqXHR) {
+                commit("RECEIVE_THREADS", data.threads);
+            }
+        });
+    },
+
+    setActiveThreadId({ commit }, payload) {
+        commit("SET_ACTIVE_THREAD_ID", payload);
+    },
+
+    sendMessage({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/messages",
+            type: "POST",
+            data: JSON.stringify({ message: payload }),
+            contentType: "application/json",
+            success: message => {
+                commit("RECEIVE_MESSAGE", message);
+            }
+        });
+    },
+
+    addMessage({ commit, state }, payload) {
+        commit("RECEIVE_MESSAGE", payload);
+    },
+
+    /*
+     * Creeer een draad
+     * @param payload: draad object
+     */
+
+    createThread({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: thread => {
+                thread.messages = []; // @APPELMOES: is dit goed?
+                commit("CREATE_THREAD", thread);
+            }
+        });
+    },
+
+    /*
+     * Delete een draad
+     * @param payload: threadId
+     */
+
+    deleteThread({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + payload,
+            type: "DELETE",
+            success: () => {
+                commit("DELETE_THREAD", payload);
+                commit("SET_ACTIVE_THREAD_ID", null);
+            }
+        });
+    },
+
+    createScript({ commit, state }) {
+
+        $.ajax({
+
+            url: "api/threads/" + state.activeThreadId + "/scripts/",
+            type: "POST",
+            success(script) {
+                commit("CREATE_SCRIPT", script);
+            }
+        });
+    },
+
+    saveScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload.id,
+            type: "PUT",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success(script) {
+                commit("UPDATE_SCRIPT", script);
+            }
+        });
+    },
+
+    receiveScript({ commit, state }, payload) {
+        commit("UPDATE_SCRIPT", payload);
+    },
+
+    /*
+     * Delete een draad
+     * @param payload: scriptId
+     */
+
+    deleteScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload,
+            type: "DELETE",
+            contentType: "application/json",
+            success() {
+                commit("DELETE_SCRIPT", payload);
+            }
+        });
+    }
+});
+
+/***/ }),
 /* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_vue_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_vue_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_vue_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_vue_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_vuex_min_js__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_vuex_min_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__lib_vuex_min_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__mutations_js__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__getters_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__actions_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__getters_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__actions_js__ = __webpack_require__(5);
 
 
 
@@ -9515,44 +9511,31 @@ module.exports = g;
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__store_store_js__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__store_getters_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__store_actions_js__ = __webpack_require__(4);
 
 
-
+// we gaan ervan uit dat geen enkele mutatie bekend is bij de client
+var mutationHandle = 0;
 
 setInterval(() => {
 
-    if (!__WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.activeThreadId) return;
-
     $.ajax({
 
-        url: "api/threads/" + __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.activeThreadId + "/messages",
+        url: "api/mutations/" + mutationHandle,
         type: "GET",
         contentType: "application/json",
-        success: messages => {
-            var thread = __WEBPACK_IMPORTED_MODULE_1__store_getters_js__["a" /* default */].getActiveThread(__WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state);
-            if (!messages) return;
-            messages.forEach(message => {
-                if (!thread.messages.find(m => m.id == message.id)) {
-                    __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].dispatch('addMessage', message);
+        success: ms => {
+            ms.forEach(m => {
+                mutationHandle = m.id;
+
+                console.log("Applying %s", m.type, m);
+                switch (m.type) {
+                    case "UPDATE_SCRIPT":
+                        __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("UPDATE_SCRIPT", m);
+                        break;
                 }
             });
         }
 
-    });
-
-    $.ajax({
-
-        url: "api/threads/" + __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.activeThreadId + "/scripts",
-        type: "GET",
-        contentType: "application/json",
-        success: scripts => {
-            if (!scripts) return;
-            scripts.forEach(script => {
-                __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].dispatch('receiveScript', script);
-            });
-        }
     });
 }, 1000);
 
@@ -9628,12 +9611,12 @@ module.exports = Component.exports
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_vue_js__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_vue_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__lib_vue_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__lib_vue_js__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_app_vue__ = __webpack_require__(11);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_app_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_app_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__store_store_js__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__store_actions_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__store_actions_js__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__api_js__ = __webpack_require__(9);
 
 
@@ -9658,7 +9641,10 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__getters_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__getters_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_vue_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__lib_vue_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__lib_vue_js__);
+
 
 
 /* harmony default export */ __webpack_exports__["a"] = ({
@@ -9687,10 +9673,16 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
         thread.scripts.push(script);
     },
 
-    UPDATE_SCRIPT(state, script) {
-        var thread = __WEBPACK_IMPORTED_MODULE_0__getters_js__["a" /* default */].getActiveThread(state);
-        var index = thread.scripts.findIndex(s => s.id === script.id);
-        thread.scripts[index] = script;
+    UPDATE_SCRIPT(state, payload) {
+        // @TODO: plaatslaan resources
+        console.log(payload);
+        var thread = state.threads.find(t => t.id === payload.values.threadId);
+        var script = thread.scripts.find(s => s.id === payload.values.id);
+        if (!script) console.warn("Geen script voor :", payload.values);else {
+            for (var property in payload.changed) {
+                script[property] = payload.values[property];
+            }
+        }
     },
 
     DELETE_SCRIPT(state, scriptId) {
@@ -9710,7 +9702,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__threadlist_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__threadlist_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__threadview_vue__ = __webpack_require__(39);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__threadview_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__threadview_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__store_getters_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__store_getters_js__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_vuex_min_js__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__lib_vuex_min_js___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__lib_vuex_min_js__);
 //
@@ -9878,6 +9870,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 /* harmony default export */ __webpack_exports__["default"] = ({
     props: { script: Object },
+    computed: {},
     methods: {
         saveScript() {
             this.$store.dispatch('saveScript', this.script);
@@ -11933,7 +11926,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  overflow-y: scroll;\n  padding: 8px;\n  background-color: #efefef;\n  margin-bottom: 3px;\n}\n.messages_view .messages .message_view * {\n  display: inline-block;\n}\n.messages_view .messages .message_view .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .id {\n  width: 5%;\n}\n.messages_view .messages .message_view .timestamp {\n  width: 20%;\n}\n.messages_view .messages .message_view .author {\n  padding: 7px;\n  float: right;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
+exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  margin-bottom: 10px;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  overflow-y: scroll;\n  padding: 8px;\n  background-color: #efefef;\n}\n.messages_view .messages .message_view * {\n  display: inline-block;\n}\n.messages_view .messages .message_view .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .id {\n  width: 5%;\n}\n.messages_view .messages .message_view .timestamp {\n  width: 20%;\n}\n.messages_view .messages .message_view .author {\n  padding: 7px;\n  float: right;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
 
 // exports
 

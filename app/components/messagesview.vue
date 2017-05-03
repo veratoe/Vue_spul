@@ -51,13 +51,13 @@
 
         .messages {
             flex: 1 1 0;
+            margin-bottom: 10px;
             overflow-y: scroll;
    
             .message_view {
                 overflow-y: scroll;
                 padding: 8px;
                 background-color: #efefef;
-                margin-bottom: 3px;
 
                 * {
                     display: inline-block;

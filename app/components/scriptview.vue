@@ -17,6 +17,8 @@
 
     export default {
         props: { script: Object },
+        computed: {
+        },
         methods: {
             saveScript () {
                 this.$store.dispatch('saveScript', this.script); 

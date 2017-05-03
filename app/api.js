@@ -1,41 +1,29 @@
 import store from "./store/store.js";
-import getters from "./store/getters.js"; 
-import actions from "./store/actions.js";
 
-setInterval(() =>{
+// we gaan ervan uit dat geen enkele mutatie bekend is bij de client
+var mutationHandle = 0;
+
+setInterval(() => {
     
-    if (!store.state.activeThreadId)
-        return;
-
     $.ajax({  
 
-        url: "api/threads/" + store.state.activeThreadId + "/messages",
+        url: "api/mutations/" + mutationHandle,
         type: "GET",
         contentType: "application/json",
-        success: (messages) => {
-            var thread = getters.getActiveThread(store.state);
-            if (!messages) return;
-            messages.forEach((message) => {
-                if (!thread.messages.find(m => m.id == message.id)) {  
-                    store.dispatch('addMessage', message);
+        success: (ms) => {
+            ms.forEach((m) => {
+                mutationHandle = m.id;
+
+                console.log("Applying %s", m.type, m);
+                switch(m.type) {
+                    case "UPDATE_SCRIPT": 
+                        store.commit("UPDATE_SCRIPT", m);
+                        break;
                 }
+
             });
         }
 
-    });
-
-    $.ajax({
-    
-        url: "api/threads/" + store.state.activeThreadId + "/scripts",
-        type: "GET",
-        contentType: "application/json",
-        success: (scripts) => {
-            if (!scripts) return;
-            scripts.forEach((script) => {
-                store.dispatch('receiveScript', script);
-            });
-                    
-        }
     });
 
 }, 1000);

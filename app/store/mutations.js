@@ -1,4 +1,5 @@
 import getters from "./getters.js";
+import Vue from     "../lib/vue.js";
 
 export default  {
 
@@ -26,11 +27,16 @@ export default  {
         thread.scripts.push(script);
     },
 
-    UPDATE_SCRIPT (state, script) {
-        var thread = getters.getActiveThread(state);
-        var index = thread.scripts.findIndex(s => s.id === script.id);
-        thread.scripts[index] = script;
-        
+    UPDATE_SCRIPT (state, payload) {
+        // @TODO: platslaan resources
+        var thread = state.threads.find(t => t.id === payload.values.threadId);
+        var script = thread.scripts.find(s => s.id === payload.values.id);
+        if (!script) console.warn("Geen script voor :", payload.values);
+        else {
+            for (var property in payload.changed) {
+                script[property] = payload.values[property];
+            }
+        }
     },
 
     DELETE_SCRIPT (state, scriptId) {
