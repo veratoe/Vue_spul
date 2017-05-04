@@ -5,12 +5,13 @@ var Script = module.exports = db.sequelize.define("script",
     {
         script: db.Sequelize.STRING(1024),
         active: db.Sequelize.BOOLEAN,
-        runs_left: db.Sequelize.INTEGER
+        runs_left: db.Sequelize.INTEGER,
+        error_message: db.Sequelize.STRING(1024),
+        last_run_time: db.Sequelize.FLOAT
     }, 
     {
         hooks: {
             afterUpdate (instance, options, fn) {
-                console.log(instance);
                 Mutation.create({ 
                     type: "UPDATE_SCRIPT",
                     values: instance.dataValues,
@@ -43,14 +44,27 @@ router.get("/threads/:id/scripts/", (req, res) => {
 
 router.put("/threads/:thread_id/scripts/:id", (req, res) => {
 
-    Script.findById(req.params.id)
+    var values = {};
+    var allowedValues = ["active", "script"];
+
+    // filter toegestane attributen
+    allowedValues.forEach(p => { 
+        if (typeof req.body[p] !== "undefined") {
+            values[p] = req.body[p];
+        }
+    });
+
+    console.log(req.body);
+    Script
+        .findById(req.params.id)
         .then(script => {
             if (!script) {
-                res.status(400).send()
+                res.status(400).send();
                 return;
             }
             
-            script.update({ script: req.body.script })
+            script
+                .update(values)
                 .then(s => {
                     res.status(200).json(s);
                 });
@@ -63,7 +77,7 @@ router.post("/threads/:id/scripts", (req, res) => {
     Thread.findById(req.params.id)
         .then(thread => {
             if (!thread) {
-                res.status(400).send()
+                res.status(400).send();
                 return;
             }
             
@@ -97,6 +111,7 @@ router.delete("/threads/:thread_id/scripts/:script_id", (req, res) => {
 // instance methods
 Script.Instance.prototype.run = function (message, threadId) {
 
+    var error;
     var {VM} = require('vm2');
     var vm = new VM({
         timeout: 10,
@@ -109,25 +124,42 @@ Script.Instance.prototype.run = function (message, threadId) {
     });
 
     console.log('running script %s', this.get("id"));
+    var start = process.hrtime();
+    var elapsed;
+
     try {
         vm.run(this.get("script"));
-        this.update({ 'runs_left': this.runs_left - 1 });
-        console.log("runs_left: %s", this.runs_left);
+        elapsed = process.hrtime(start)[1] / 1000000;
         console.log('done');
-    } catch (err) {
-        console.log('error on script %s : %s, deactivating', this.get("id"), err);
-        this.update({ active: false });
-    }
 
+    } catch (e) {
+        error = e;
+        console.log('error on script %s : %s, deactivating', this.get("id"), e);
+        this
+            .update({ active: false, error_message: e.toString() });
+    }
     
-    if (vm._context.output) {
-    }
-    //    console.log(vm._context.output);
-    //    var output = vm._context.output.substring(0, 139);
-    //    Message.build({ message: output, threadId: threadId }) .save()
-    //        .then(() => { console.log('message added'); })
-    //        .catch((err) => { console.log(err) });
-    //}
-    //
+    if (!error) {
 
-}
+        if (vm._context.output) {
+            var output = vm._context.output.substring(0, 139);
+            Message
+                .build({ message: output, threadId: threadId }) 
+                .save()
+                .then(() => { console.log('message added'); })
+                .catch((err) => { console.log(err); });
+
+            this.update({ 
+                runs_left: this.runs_left - 1, 
+                error_message: "",
+                last_run_time: elapsed
+            });
+
+            console.log("run_time", elapsed);
+            console.log("runs_left: %s", this.runs_left);
+            console.log(vm._context.output);
+        }
+
+    }
+
+};

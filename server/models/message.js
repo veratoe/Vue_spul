@@ -1,12 +1,25 @@
 var db = require("../db");
 
 // define model
-var Message = module.exports = db.sequelize.define("message", {
-    message: db.Sequelize.STRING,
-});
+var Message = module.exports = db.sequelize.define("message", 
+    {
+        message: db.Sequelize.STRING,
+    },
+    {
+        hooks: {
+            afterCreate (instance, options) {
+                Mutation.create({
+                    type: "CREATE_MESSAGE",
+                    values: instance.dataValues                                         
+                });
+            }
+        }
+    }
+);
 
 var router = require("../router.js");
 var Thread = require("./thread.js");
+var Mutation = require("./mutation.js");
 
 Message.sync();
 

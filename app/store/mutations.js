@@ -18,8 +18,9 @@ export default  {
         state.activeThreadId = threadId; 
     },
 
-    RECEIVE_MESSAGE (state, message) {
-        getters.getActiveThread(state).messages.push(message);
+    CREATE_MESSAGE (state, message) {
+        var thread = state.threads.find(t => t.id === message.threadId);
+        thread.messages.push(message);
     },
 
     CREATE_SCRIPT (state, script) {

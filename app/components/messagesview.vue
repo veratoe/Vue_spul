@@ -4,7 +4,7 @@
             <div class="message_view" v-for="message in messages" :key=message.id>
                 <span class="message">{{ message.message }}</span>
                 <span class="id">{{ message.id }}</span>
-                <span class="timestamp">{{ message.createdAt }} </span>
+                <span class="timestamp">{{ message.createdAt |  time_ago }} </span>
                 <span class="author">{{ message.author }} </span>
             </div>
         </div>
@@ -29,7 +29,7 @@
         },
         created () {
             this.$store.subscribe((mutation, state) => {
-                if (mutation.type === "RECEIVE_MESSAGE") {
+                if (mutation.type === "CREATE_MESSAGE") {
                     this.scrollToBottom();
                 }
             });

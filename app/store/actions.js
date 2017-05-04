@@ -24,14 +24,9 @@ export default {
             data: JSON.stringify({ message: payload }),
             contentType: "application/json",
             success: (message) => {
-                commit("RECEIVE_MESSAGE", message);
             }
         });
 
-    },
-
-    addMessage ({ commit, state }, payload) {
-        commit("RECEIVE_MESSAGE", payload);
     },
 
     /*
@@ -112,6 +107,18 @@ export default {
             contentType: "application/json",
             success () {
                 commit("DELETE_SCRIPT", payload); 
+            }
+        });
+    },
+
+    activateScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload,
+            type: "PUT",
+            data: JSON.stringify({ active: true }),
+            contentType: "application/json",
+            success () {
             }
         });
     }

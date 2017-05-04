@@ -2,9 +2,17 @@
 
     <div class="script_view">
         <div class="header">
-            <span class="id">{{ script.id }}</span> | <span class="created_at">created: {{ script.createdAt }}</span> | <span> runs_left: {{ script.runs_left }} </span> <strong v-if="script.active" class="status">ACTIEF</strong><strong v-else>INACTIEF</strong>
+            <span class="id">{{ script.id }}</span> | 
+            <span class="created_at">created: {{ script.createdAt }}</span> | 
+            <span>runs_left: {{ script.runs_left }} </span> |
+            <span>last_run_time: {{ script.last_run_time }}</span> | 
+            <span class="status">
+                <strong v-if="script.active">ACTIEF</strong>
+                <strong v-else class="status_inactive" @click="activateScript">INACTIEF</strong>
+            </span>
         </div>
         <textarea class="script" v-model="script.script" />
+        <div class="error">{{ script.error_message }}</div>
         <div cass="controls">
             <button @click="saveScript">Opslaan</button>
             <button @click="deleteScript">Wissen</button>
@@ -25,6 +33,9 @@
             },
             deleteScript() {
                 this.$store.dispatch('deleteScript', this.script.id); 
+            },
+            activateScript() {
+                this.$store.dispatch('activateScript', this.script.id); 
             }
         }
     }
@@ -41,7 +52,21 @@
 
             .status {
                 color: green;
+
+                &.status_inactive {
+                    color: #888;
+                    cursor: pointer;
+                    &:hover {
+                        text-decoration: underline
+                    }
+                }
+               
             }
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
         }
 
         textarea {

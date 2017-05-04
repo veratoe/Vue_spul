@@ -14,11 +14,16 @@ setInterval(() => {
             ms.forEach((m) => {
                 mutationHandle = m.id;
 
-                console.log("Applying %s", m.type, m);
                 switch(m.type) {
                     case "UPDATE_SCRIPT": 
+                        console.log("Applying %s", m.type, m);
                         store.commit("UPDATE_SCRIPT", m);
-                        break;
+                    break;
+
+                    case "CREATE_MESSAGE": 
+                        console.log("Applying %s", m.type, m);
+                        store.commit("CREATE_MESSAGE", m.values);
+                    break;
                 }
 
             });
