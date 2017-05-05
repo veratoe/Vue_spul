@@ -44,6 +44,11 @@ export default  {
         var thread = getters.getActiveThread(state);
         var index = thread.scripts.findIndex(s => s.id === scriptId);
         thread.scripts.splice(index, 1);
+    },
+
+    LOGIN (state, user) {
+        state.username = user.username;
+        state.password = user.password;
     }
 };
 

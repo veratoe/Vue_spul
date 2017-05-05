@@ -3,5 +3,6 @@ module.exports = {
     Thread: require("./thread.js"),
     Script: require("./script.js"),
     Mutation: require("./mutation.js"),
+    User: require("./user.js"),
 };
 

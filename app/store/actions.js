@@ -121,5 +121,34 @@ export default {
             success () {
             }
         });
+    },
+
+    /*
+     * user
+     */
+
+    createUser({ commit, state }, payload) {
+        console.log('creatan with', payload);
+        $.ajax({
+            url: "api/users",
+            type: "POST",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success () {}
+        });
+    },
+
+    login({ commit, state }, payload) {
+        commit("LOGIN", payload);
+    },
+
+    updateUsername({ commit, state }, payload) {
+        commit("UPDATE_USERNAME", payload);
+    },
+
+    updatePassword({ commit, state }, payload) {
+        commit("UPDATE_PASSWORD", payload);
     }
+
 };
+

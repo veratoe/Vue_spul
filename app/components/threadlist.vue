@@ -52,6 +52,7 @@
 
     background-color: #f0f0f0;
     width: 25%;
+    height: 100%;
     border-right: 2px solid #ccc;
 
     .thread_list_item {

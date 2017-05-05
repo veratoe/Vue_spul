@@ -4,7 +4,7 @@
             <div class="message_view" v-for="message in messages" :key=message.id>
                 <span class="message">{{ message.message }}</span>
                 <span class="id">{{ message.id }}</span>
-                <span class="timestamp">{{ message.createdAt |  time_ago }} </span>
+                <span class="timestamp">{{ (now - (new Date(message.createdAt)).getTime()) / 1000 | time_ago  }} </span>
                 <span class="author">{{ message.author }} </span>
             </div>
         </div>
@@ -20,6 +20,11 @@
         name: "MessagesView",
         components: { MessageInput },
         props: { messages: Array },
+        data () {
+            return {
+                now: Date.now()
+            }
+        },
         methods: {
             scrollToBottom () {
                 var $messages = $(".messages");
@@ -28,6 +33,7 @@
             }
         },
         created () {
+            this.int = setInterval(() => { this.$data.now = Date.now(); console.log('wub') }, 10000);
             this.$store.subscribe((mutation, state) => {
                 if (mutation.type === "CREATE_MESSAGE") {
                     this.scrollToBottom();
@@ -37,6 +43,10 @@
                 $(".messages").scrollTop($(".messages")[0].scrollHeight);
             });
             
+        },
+        destroyed () {
+
+            clearInterval(this.int);
         }
     }
 
