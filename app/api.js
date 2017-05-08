@@ -5,7 +5,6 @@ var mutationHandle = 0;
 
 
 setInterval(() => {
-    console.log(store.state.username, store.state.password);
     
     $.ajax({  
 

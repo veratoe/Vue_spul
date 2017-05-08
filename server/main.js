@@ -19,20 +19,16 @@ app.use((req, res, next) => {
     models.User
         .findOne({ where: { username: user.name }})
         .then(u => {
-            if (!u) {
-                throw "not found";
+            if (u) {
+                var hash = crypto.createHash('sha256').update(u.salt + user.pass).digest('hex');
+                if (u.password === hash) {
+                    console.log('user authenticated');
+                    req.authenticated = true;
+                    req.user = u;
+                    return next();
+                }
             }
-            console.log('found user %s, testan password', user.name);
-
-            var hash = crypto.createHash('sha256').update(u.salt + user.pass).digest('hex');
-            console.log(u.password);
-            console.log(hash);
-            if (u.password === hash) console.log('LE AUTHORIZED!!!');
             
-            next();
-        })
-        .catch(() => {
-            console.error("%s NOT FOUND!", user.name);
             return next();
         });
 

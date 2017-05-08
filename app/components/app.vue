@@ -35,6 +35,7 @@
         flex-direction: column;
 
         .main_view {
+            display: flex;
             flex: 1 1 0;
         }
     }

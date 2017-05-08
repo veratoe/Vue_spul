@@ -9,6 +9,7 @@ Vue.use(Vuex);
 const state = {
     threads: [],
     activeThreadId: null,
+    logged_in: null
 };
 
 

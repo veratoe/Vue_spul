@@ -1,8 +1,14 @@
+var User = require("./user.js");
+var Message = require("./message.js");
+
 module.exports = {
-    Message:require("./message.js"),
+    User,
+    Message,
     Thread: require("./thread.js"),
     Script: require("./script.js"),
     Mutation: require("./mutation.js"),
-    User: require("./user.js"),
 };
 
+
+User.sync();
+Message.sync();

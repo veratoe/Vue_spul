@@ -31,6 +31,7 @@ export default  {
     UPDATE_SCRIPT (state, payload) {
         // @TODO: platslaan resources
         var thread = state.threads.find(t => t.id === payload.values.threadId);
+        if (!thread) return;
         var script = thread.scripts.find(s => s.id === payload.values.id);
         if (!script) console.warn("Geen script voor :", payload.values);
         else {
@@ -47,8 +48,20 @@ export default  {
     },
 
     LOGIN (state, user) {
+        state.logged_in = true;
         state.username = user.username;
         state.password = user.password;
+    },
+
+    LOGOUT (state) {
+        state.logged_in = false;
+        state.username = null;
+        state.password = null;
+    },
+
+    ERROR_ON_LOGIN (state) {
+        state.logged_in = false;
+        state.error_on_login = true;
     }
 };
 

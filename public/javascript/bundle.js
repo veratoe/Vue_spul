@@ -9181,7 +9181,25 @@ const getters = {
     },
 
     login({ commit, state }, payload) {
-        commit("LOGIN", payload);
+
+        $.ajax({
+            url: "api/users/login",
+            // @APPELMOES: 1 keer met de hand meegeven ?
+            headers: {
+                'Authorization': "Basic " + btoa(payload.username + ":" + payload.password)
+            },
+            contentType: "application/json",
+            success() {
+                commit("LOGIN", payload);
+            },
+            error() {
+                commit("ERROR_ON_LOGIN");
+            }
+        });
+    },
+
+    logout({ commit, state }) {
+        commit("LOGOUT");
     },
 
     updateUsername({ commit, state }, payload) {
@@ -9216,7 +9234,8 @@ __WEBPACK_IMPORTED_MODULE_0__lib_vue_js___default.a.use(__WEBPACK_IMPORTED_MODUL
 
 const state = {
     threads: [],
-    activeThreadId: null
+    activeThreadId: null,
+    logged_in: null
 };
 
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_1__lib_vuex_min_js___default.a.Store({
@@ -9550,7 +9569,6 @@ module.exports = g;
 var mutationHandle = 0;
 
 setInterval(() => {
-    console.log(__WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.username, __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.password);
 
     $.ajax({
 
@@ -9742,6 +9760,7 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
     UPDATE_SCRIPT(state, payload) {
         // @TODO: platslaan resources
         var thread = state.threads.find(t => t.id === payload.values.threadId);
+        if (!thread) return;
         var script = thread.scripts.find(s => s.id === payload.values.id);
         if (!script) console.warn("Geen script voor :", payload.values);else {
             for (var property in payload.changed) {
@@ -9757,8 +9776,20 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
     },
 
     LOGIN(state, user) {
+        state.logged_in = true;
         state.username = user.username;
         state.password = user.password;
+    },
+
+    LOGOUT(state) {
+        state.logged_in = false;
+        state.username = null;
+        state.password = null;
+    },
+
+    ERROR_ON_LOGIN(state) {
+        state.logged_in = false;
+        state.error_on_login = true;
     }
 });
 
@@ -9916,6 +9947,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -9926,32 +9965,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             password: null
         };
     },
-    /*
-            computed: {
-                username: {
-                    get () {
-                        return this.$store.state.username;
-                    },
-                    set (value) {
-                       this.$store.dispatch('updateUsername', value); 
-                    }
-                },
-                password: {
-                    get () {
-                        return this.$store.state.password;
-                    },
-                    set (value) {
-                       this.$store.dispatch('updatePassword', value); 
-                    }
-                }
-            },
-    */
+    computed: {
+        logged_in() {
+            return this.$store.state.logged_in;
+        }
+    },
     methods: {
         createUser() {
             this.$store.dispatch('createUser', { username: this.username, password: this.password });
         },
         login() {
             this.$store.dispatch('login', { username: this.username, password: this.password });
+        },
+        logout() {
+            this.$store.dispatch('logout');
         }
     }
 });
@@ -12110,7 +12137,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.navigation_bar {\n  background-color: #222;\n  padding: 10px;\n}\n", ""]);
+exports.push([module.i, "\n.navigation_bar {\n  background-color: #222;\n  padding: 10px;\n}\n.navigation_bar .title {\n  float: left;\n  margin-right: 20px;\n  color: #d44c4c;\n  font-weight: bold;\n  font-size: 18px;\n}\n.navigation_bar input {\n  padding: 4px;\n  border: 0;\n  outline: 0;\n}\n", ""]);
 
 // exports
 
@@ -12180,7 +12207,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.app {\n  display: flex;\n  flex-direction: column;\n}\n.app .main_view {\n  flex: 1 1 0;\n}\n", ""]);
+exports.push([module.i, "\n.app {\n  display: flex;\n  flex-direction: column;\n}\n.app .main_view {\n  display: flex;\n  flex: 1 1 0;\n}\n", ""]);
 
 // exports
 
@@ -13054,7 +13081,16 @@ if (false) {
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "navigation_bar"
-  }, [_c('label', [_vm._v("username")]), _vm._v(" "), _c('input', {
+  }, [_c('span', {
+    staticClass: "title"
+  }, [_vm._v("OOLEWAPPER")]), _vm._v(" "), (_vm.logged_in) ? _c('div', [_vm._v("\n        Welkom, "), _c('strong', [_vm._v(_vm._s(_vm.username))]), _vm._v(" "), _c('button', {
+    staticStyle: {
+      "float": "right"
+    },
+    on: {
+      "click": _vm.logout
+    }
+  }, [_vm._v("Logout")])]) : _c('div', [_c('label', [_vm._v("username")]), _vm._v(" "), _c('input', {
     directives: [{
       name: "model",
       rawName: "v-model",
@@ -13088,13 +13124,16 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }), _vm._v(" "), _c('button', {
     on: {
-      "click": _vm.createUser
-    }
-  }, [_vm._v("create")]), _vm._v(" "), _c('button', {
-    on: {
       "click": _vm.login
     }
-  }, [_vm._v("login")])])
+  }, [_vm._v("login")]), _vm._v(" "), _c('button', {
+    staticStyle: {
+      "float": "right"
+    },
+    on: {
+      "click": _vm.createUser
+    }
+  }, [_vm._v("Nieuwe user")])])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {

@@ -21,8 +21,6 @@ var router = require("../router.js");
 var Thread = require("./thread.js");
 var Mutation = require("./mutation.js");
 
-Message.sync();
-
 // REST routes
 router.get("/threads/:id/messages", (req, res) => {
 

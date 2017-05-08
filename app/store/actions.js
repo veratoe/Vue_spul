@@ -139,7 +139,25 @@ export default {
     },
 
     login({ commit, state }, payload) {
-        commit("LOGIN", payload);
+
+        $.ajax({
+            url: "api/users/login",
+            // @APPELMOES: 1 keer met de hand meegeven ?
+            headers: {
+                'Authorization': "Basic " + btoa(payload.username + ":" + payload.password)
+            },
+            contentType: "application/json",
+            success () {
+                commit("LOGIN", payload);
+            },
+            error() {
+                commit("ERROR_ON_LOGIN");
+            }
+        });
+    },
+
+    logout({ commit, state }) {
+        commit("LOGOUT");
     },
 
     updateUsername({ commit, state }, payload) {

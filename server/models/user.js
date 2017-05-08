@@ -19,19 +19,30 @@ var Message = require("./message.js");
 
 User.hasMany(Message);
 
-User.sync();
-
 router.post("/users", (req, res) => {
 
     var salt = crypto.randomBytes(16).toString('hex');
-    console.log(salt);
     var hash = crypto.createHash('sha256').update(salt + req.body.password).digest('hex');
-    console.log(hash);
 
     User
         .create({ username: req.body.username, password: hash, salt: salt })
         .then(u => {
             res.status(200).json(u);
         });
+
+});
+
+router.get("/users/login", (req, res) => {
+
+    var allowedFields = ['username', 'createdAt', 'updatedAt'];
+    var response = {};
+
+    if (req.authenticated) {
+        allowedFields.forEach((field) => { response[field] = req.user[field]; });
+        res.status(200).json(response);
+        return;
+    }
+
+    res.status(400).end();
 
 });
