@@ -5,8 +5,6 @@ var bodyParser = require('body-parser');
 var basicAuth = require('basic-auth');
 var crypto = require('crypto');
 
-// Load models
-var models = require("./models");
 
 // authentication
 app.use((req, res, next) => {
@@ -22,10 +20,8 @@ app.use((req, res, next) => {
             if (u) {
                 var hash = crypto.createHash('sha256').update(u.salt + user.pass).digest('hex');
                 if (u.password === hash) {
-                    console.log('user authenticated');
                     req.authenticated = true;
                     req.user = u;
-                    return next();
                 }
             }
             
@@ -33,6 +29,9 @@ app.use((req, res, next) => {
         });
 
 });
+
+// Load models
+var models = require("./models");
 
 // parsing request body for POST, PUT
 app.use(bodyParser.json());

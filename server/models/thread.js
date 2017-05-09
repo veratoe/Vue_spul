@@ -8,14 +8,15 @@ var Thread = module.exports = db.sequelize.define("thread", {
 var router = require("../router.js");
 var Message = require("./message");
 var Script = require("./script");
+var User = require("./user");
 
 Thread.hasMany(Message);
-Thread.sync();
 
 // routes
 router.get("/threads", (req, res) => {
 
-    Thread.findAll({ include: [ Message, Script ] })
+    Thread
+        .findAll({ include: [ { model: Message, include: [User] }, Script ] }) 
         .then(threads => {
             res.json({ threads: threads });
         })
@@ -26,12 +27,13 @@ router.get("/threads", (req, res) => {
 
 router.post("/threads", (req, res) => {
 
-    Thread.create({
-        title: req.body.title
-    })
-    .then(thread => {
-        res.status(200).json(thread);
-    });
+    Thread
+        .create({
+            title: req.body.title
+        })
+        .then(thread => {
+            res.status(200).json(thread);
+        });
 
 });
 

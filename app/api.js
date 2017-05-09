@@ -3,7 +3,6 @@ import store from "./store/store.js";
 // we gaan ervan uit dat geen enkele mutatie bekend is bij de client
 var mutationHandle = 0;
 
-
 setInterval(() => {
     
     $.ajax({  
@@ -11,9 +10,6 @@ setInterval(() => {
         url: "api/mutations/" + mutationHandle,
         type: "GET",
         contentType: "application/json",
-        headers: {
-            'Authorization': "Basic " + btoa(store.state.username + ":" + store.state.password)
-        },
         success: (ms) => {
             ms.forEach((m) => {
                 mutationHandle = m.id;
@@ -33,4 +29,4 @@ setInterval(() => {
 
     });
 
-}, 1000);
+}, 10000);

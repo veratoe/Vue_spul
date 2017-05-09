@@ -51,12 +51,14 @@ export default  {
         state.logged_in = true;
         state.username = user.username;
         state.password = user.password;
+        $.ajaxSetup({ headers: { 'Authorization': "Basic " + btoa(user.username + ":" + user.password) } });
     },
 
     LOGOUT (state) {
         state.logged_in = false;
         state.username = null;
         state.password = null;
+        $.ajaxSetup({ headers: { 'Authorization': null }});
     },
 
     ERROR_ON_LOGIN (state) {

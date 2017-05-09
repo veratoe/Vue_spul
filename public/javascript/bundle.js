@@ -9575,9 +9575,6 @@ setInterval(() => {
         url: "api/mutations/" + mutationHandle,
         type: "GET",
         contentType: "application/json",
-        headers: {
-            'Authorization': "Basic " + btoa(__WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.username + ":" + __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].state.password)
-        },
         success: ms => {
             ms.forEach(m => {
                 mutationHandle = m.id;
@@ -9595,7 +9592,7 @@ setInterval(() => {
         }
 
     });
-}, 1000);
+}, 10000);
 
 /***/ }),
 /* 10 */
@@ -9779,12 +9776,14 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
         state.logged_in = true;
         state.username = user.username;
         state.password = user.password;
+        $.ajaxSetup({ headers: { 'Authorization': "Basic " + btoa(user.username + ":" + user.password) } });
     },
 
     LOGOUT(state) {
         state.logged_in = false;
         state.username = null;
         state.password = null;
+        $.ajaxSetup({ headers: { 'Authorization': null } });
     },
 
     ERROR_ON_LOGIN(state) {
@@ -9878,6 +9877,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__messageinput_vue__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__messageinput_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__messageinput_vue__);
+//
+//
 //
 //
 //
@@ -12109,7 +12110,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  margin-bottom: 10px;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  overflow-y: scroll;\n  padding: 8px;\n  background-color: #efefef;\n}\n.messages_view .messages .message_view * {\n  display: inline-block;\n}\n.messages_view .messages .message_view .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .id {\n  width: 5%;\n}\n.messages_view .messages .message_view .timestamp {\n  width: 20%;\n}\n.messages_view .messages .message_view .author {\n  padding: 7px;\n  float: right;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
+exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  margin-bottom: 10px;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  flex-direction: row;\n  display: flex;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view .user {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #f7c8c8;\n  text-align: right;\n}\n.messages_view .messages .message_view .body {\n  display: flex;\n  flex: 1 1 0;\n  padding: 8px;\n  background-color: #efefef;\n}\n.messages_view .messages .message_view .body .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .body .id {\n  width: 5%;\n  font-weight: bold;\n  color: #777;\n}\n.messages_view .messages .message_view .body .timestamp {\n  width: 20%;\n  text-align: right;\n  color: #999;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
 
 // exports
 
@@ -13025,15 +13026,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     return _c('div', {
       key: message.id,
       staticClass: "message_view"
+    }, [_c('div', {
+      staticClass: "user"
+    }, [_vm._v(_vm._s(message.user && message.user.username))]), _vm._v(" "), _c('div', {
+      staticClass: "body"
     }, [_c('span', {
       staticClass: "message"
     }, [_vm._v(_vm._s(message.message))]), _vm._v(" "), _c('span', {
       staticClass: "id"
     }, [_vm._v(_vm._s(message.id))]), _vm._v(" "), _c('span', {
       staticClass: "timestamp"
-    }, [_vm._v(_vm._s(_vm._f("time_ago")((_vm.now - (new Date(message.createdAt)).getTime()) / 1000)) + " ")]), _vm._v(" "), _c('span', {
-      staticClass: "author"
-    }, [_vm._v(_vm._s(message.author) + " ")])])
+    }, [_vm._v(_vm._s(_vm._f("time_ago")((_vm.now - (new Date(message.createdAt)).getTime()) / 1000)) + " ")])])])
   })), _vm._v(" "), _c('MessageInput')], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true

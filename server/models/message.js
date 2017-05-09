@@ -8,10 +8,18 @@ var Message = module.exports = db.sequelize.define("message",
     {
         hooks: {
             afterCreate (instance, options) {
-                Mutation.create({
-                    type: "CREATE_MESSAGE",
-                    values: instance.dataValues                                         
-                });
+                Message
+                    .findById(instance.dataValues.id, { include: [{ model: User, attributes: { exclude: ['password', 'salt'] }}]})
+                    .then(m => {
+
+                        console.log(m.toJSON());
+                        Mutation.create({
+                            type: "CREATE_MESSAGE",
+                            values: m.dataValues                                         
+                        });
+                    });
+                
+
             }
         }
     }
@@ -20,6 +28,9 @@ var Message = module.exports = db.sequelize.define("message",
 var router = require("../router.js");
 var Thread = require("./thread.js");
 var Mutation = require("./mutation.js");
+var User = require("./user.js");
+
+Message.belongsTo(User);
 
 // REST routes
 router.get("/threads/:id/messages", (req, res) => {
@@ -32,6 +43,11 @@ router.get("/threads/:id/messages", (req, res) => {
 
 router.post("/threads/:id/messages", (req, res) => {
 
+    if (!req.authenticated) {
+        res.status(400).send();
+        return;
+    }
+
     Thread.findById(req.params.id)
         .then(thread => {
             if (!thread) {  
@@ -39,7 +55,7 @@ router.post("/threads/:id/messages", (req, res) => {
                 return;
             }
 
-            Message.create({ message: req.body.message, threadId: req.params.id })
+            Message.create({ message: req.body.message, threadId: req.params.id, userId: req.user.id })
                 .then(m => {
                     res.status(200).json(m);
 
