@@ -18,9 +18,17 @@ export default  {
         state.activeThreadId = threadId; 
     },
 
-    CREATE_MESSAGE (state, message) {
-        var thread = state.threads.find(t => t.id === message.threadId);
-        thread.messages.push(message);
+    CREATE_MESSAGE (state, payload) {
+        var thread = state.threads.find(t => t.id === payload.values.threadId);
+        thread.messages.push(payload.values);
+    },
+
+    UPDATE_MESSAGE (state, payload) {
+        var thread = state.threads.find(t => t.id === payload.values.threadId);
+        var message = thread.messages.find(m => m.id === payload.values.id);
+        ["star"].forEach((property) => {
+            message[property] = payload.values[property];
+        });
     },
 
     CREATE_SCRIPT (state, script) {

@@ -1,16 +1,18 @@
 <template>
     <div class="messages_view">
         <div class="messages">
-            <div class="message_view" v-for="message in messages" :key=message.id>
-                <div class="user">{{ message.user && message.user.username }}</div>
+            <div class="message_view" v-for="message in messages" :key=message.id :class="{ 'star': message.star }">
+                <span class="star" v-if="message.star">*</span>
+                <div v-if="message.owner == 'user'" class="user">{{ message.user && message.user.username }}</div>
+                <div v-if="message.owner == 'script'" class="script">{{ message.script && message.script.name }}</div>
                 <div class="body">
-                    <span class="message">{{ message.message }}</span>
+                    <span class="message" >{{ message.message }}</span>
                     <span class="id">{{ message.id }}</span>
                     <span class="timestamp">{{ (now - (new Date(message.createdAt)).getTime()) / 1000 | time_ago  }} </span>
                 </div>
             </div>
         </div>
-        <MessageInput></MessageInput>
+        <MessageInput v-if="logged_in"></MessageInput>
     </div>
 </template>
 
@@ -27,6 +29,11 @@
                 now: Date.now()
             }
         },
+        computed: {
+            logged_in () {
+                return this.$store.state.logged_in;
+            }
+        },
         methods: {
             scrollToBottom () {
                 var $messages = $(".messages");
@@ -35,9 +42,9 @@
             }
         },
         created () {
-            this.int = setInterval(() => { this.$data.now = Date.now(); console.log('wub') }, 10000);
+            this.int = setInterval(() => { this.$data.now = Date.now(); }, 10000);
             this.$store.subscribe((mutation, state) => {
-                if (mutation.type === "CREATE_MESSAGE") {
+                if (mutation.type === "CREATE_MESSAGE" || mutation.type === "LOGIN") {
                     this.scrollToBottom();
                 }
             });
@@ -47,7 +54,6 @@
             
         },
         destroyed () {
-
             clearInterval(this.int);
         }
     }
@@ -69,13 +75,30 @@
             .message_view {
                 flex-direction: row;
                 display: flex;
-                overflow-y: scroll;
+                position: relative;
 
+                .star {
+                    position: absolute;
+                    left: 6px;
+                    color: yellow;
+                    font-size: 23px;
+                    top: 5px;
+                }
+ 
                 .user {
                     flex: 0 1 120px; 
                     width: 10%;
                     padding: 8px;
-                    background-color: #f7c8c8;
+                    background-color: #c8dbf7;
+                    text-align: right;
+                }
+
+                .script {
+                    flex: 0 1 120px; 
+                    width: 10%;
+                    padding: 8px;
+                    background-color: #ffffcc;
+                    font-weight: bold;
                     text-align: right;
                 }
 
@@ -84,6 +107,7 @@
                     flex: 1 1 0;
                     padding: 8px;
                     background-color: #efefef;
+     
 
                     .message {
                         width: 60%;
@@ -101,6 +125,16 @@
                     }
                 }
 
+                &.star {
+                    .body, .user, .script {
+                        background: #888 !important;
+                    }                 
+    
+                    .message {
+                        color: yellow;
+                        font-weight: bold;
+                    }
+                }
             }
         }
 

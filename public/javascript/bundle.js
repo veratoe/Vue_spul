@@ -9121,6 +9121,7 @@ const getters = {
     },
 
     saveScript({ commit, state }, payload) {
+        console.log(payload);
 
         $.ajax({
             url: "api/threads/" + state.activeThreadId + "/scripts/" + payload.id,
@@ -9579,20 +9580,24 @@ setInterval(() => {
             ms.forEach(m => {
                 mutationHandle = m.id;
 
+                console.log(m);
                 switch (m.type) {
                     case "UPDATE_SCRIPT":
                         __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("UPDATE_SCRIPT", m);
                         break;
 
                     case "CREATE_MESSAGE":
-                        __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("CREATE_MESSAGE", m.values);
+                        __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("CREATE_MESSAGE", m);
                         break;
+
+                    case "UPDATE_MESSAGE":
+                        __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("UPDATE_MESSAGE", m);
                 }
             });
         }
 
     });
-}, 10000);
+}, 500);
 
 /***/ }),
 /* 10 */
@@ -9744,9 +9749,17 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
         state.activeThreadId = threadId;
     },
 
-    CREATE_MESSAGE(state, message) {
-        var thread = state.threads.find(t => t.id === message.threadId);
-        thread.messages.push(message);
+    CREATE_MESSAGE(state, payload) {
+        var thread = state.threads.find(t => t.id === payload.values.threadId);
+        thread.messages.push(payload.values);
+    },
+
+    UPDATE_MESSAGE(state, payload) {
+        var thread = state.threads.find(t => t.id === payload.values.threadId);
+        var message = thread.messages.find(m => m.id === payload.values.id);
+        ["star"].forEach(property => {
+            message[property] = payload.values[property];
+        });
     },
 
     CREATE_SCRIPT(state, script) {
@@ -9893,6 +9906,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 
 
@@ -9906,6 +9921,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
             now: Date.now()
         };
     },
+    computed: {
+        logged_in() {
+            return this.$store.state.logged_in;
+        }
+    },
     methods: {
         scrollToBottom() {
             var $messages = $(".messages");
@@ -9914,10 +9934,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
     created() {
         this.int = setInterval(() => {
-            this.$data.now = Date.now();console.log('wub');
+            this.$data.now = Date.now();
         }, 10000);
         this.$store.subscribe((mutation, state) => {
-            if (mutation.type === "CREATE_MESSAGE") {
+            if (mutation.type === "CREATE_MESSAGE" || mutation.type === "LOGIN") {
                 this.scrollToBottom();
             }
         });
@@ -9926,7 +9946,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         });
     },
     destroyed() {
-
         clearInterval(this.int);
     }
 });
@@ -10047,14 +10066,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+    data: () => {
+        return {
+            script_script: null,
+            script_name: null
+        };
+    },
     props: { script: Object },
     computed: {},
     methods: {
         saveScript() {
-            this.$store.dispatch('saveScript', this.script);
+            this.$store.dispatch('saveScript', {
+                threadId: this.script.threadId,
+                id: this.script.id,
+                script: this.script_script,
+                name: this.script_name
+            });
         },
         deleteScript() {
             this.$store.dispatch('deleteScript', this.script.id);
@@ -10062,6 +10093,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         activateScript() {
             this.$store.dispatch('activateScript', this.script.id);
         }
+    },
+    created() {
+        this.script_script = this.script.script;
+        this.script_name = this.script.name;
     }
 });
 
@@ -12110,7 +12145,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  margin-bottom: 10px;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  flex-direction: row;\n  display: flex;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view .user {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #f7c8c8;\n  text-align: right;\n}\n.messages_view .messages .message_view .body {\n  display: flex;\n  flex: 1 1 0;\n  padding: 8px;\n  background-color: #efefef;\n}\n.messages_view .messages .message_view .body .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .body .id {\n  width: 5%;\n  font-weight: bold;\n  color: #777;\n}\n.messages_view .messages .message_view .body .timestamp {\n  width: 20%;\n  text-align: right;\n  color: #999;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
+exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  margin-bottom: 10px;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  flex-direction: row;\n  display: flex;\n  position: relative;\n}\n.messages_view .messages .message_view .star {\n  position: absolute;\n  left: 6px;\n  color: yellow;\n  font-size: 23px;\n  top: 5px;\n}\n.messages_view .messages .message_view .user {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #c8dbf7;\n  text-align: right;\n}\n.messages_view .messages .message_view .script {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #ffffcc;\n  font-weight: bold;\n  text-align: right;\n}\n.messages_view .messages .message_view .body {\n  display: flex;\n  flex: 1 1 0;\n  padding: 8px;\n  background-color: #efefef;\n}\n.messages_view .messages .message_view .body .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .body .id {\n  width: 5%;\n  font-weight: bold;\n  color: #777;\n}\n.messages_view .messages .message_view .body .timestamp {\n  width: 20%;\n  text-align: right;\n  color: #999;\n}\n.messages_view .messages .message_view.star .body,\n.messages_view .messages .message_view.star .user,\n.messages_view .messages .message_view.star .script {\n  background: #888 !important;\n}\n.messages_view .messages .message_view.star .message {\n  color: yellow;\n  font-weight: bold;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
 
 // exports
 
@@ -13025,10 +13060,17 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, _vm._l((_vm.messages), function(message) {
     return _c('div', {
       key: message.id,
-      staticClass: "message_view"
-    }, [_c('div', {
+      staticClass: "message_view",
+      class: {
+        'star': message.star
+      }
+    }, [(message.star) ? _c('span', {
+      staticClass: "star"
+    }, [_vm._v("*")]) : _vm._e(), _vm._v(" "), (message.owner == 'user') ? _c('div', {
       staticClass: "user"
-    }, [_vm._v(_vm._s(message.user && message.user.username))]), _vm._v(" "), _c('div', {
+    }, [_vm._v(_vm._s(message.user && message.user.username))]) : _vm._e(), _vm._v(" "), (message.owner == 'script') ? _c('div', {
+      staticClass: "script"
+    }, [_vm._v(_vm._s(message.script && message.script.name))]) : _vm._e(), _vm._v(" "), _c('div', {
       staticClass: "body"
     }, [_c('span', {
       staticClass: "message"
@@ -13037,7 +13079,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_vm._v(_vm._s(message.id))]), _vm._v(" "), _c('span', {
       staticClass: "timestamp"
     }, [_vm._v(_vm._s(_vm._f("time_ago")((_vm.now - (new Date(message.createdAt)).getTime()) / 1000)) + " ")])])])
-  })), _vm._v(" "), _c('MessageInput')], 1)
+  })), _vm._v(" "), (_vm.logged_in) ? _c('MessageInput') : _vm._e()], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -13212,17 +13254,33 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     directives: [{
       name: "model",
       rawName: "v-model",
-      value: (_vm.script.script),
-      expression: "script.script"
+      value: (_vm.script_script),
+      expression: "script_script"
     }],
     staticClass: "script",
     domProps: {
-      "value": (_vm.script.script)
+      "value": (_vm.script_script)
     },
     on: {
       "input": function($event) {
         if ($event.target.composing) { return; }
-        _vm.script.script = $event.target.value
+        _vm.script_script = $event.target.value
+      }
+    }
+  }), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.script_name),
+      expression: "script_name"
+    }],
+    domProps: {
+      "value": (_vm.script_name)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.script_name = $event.target.value
       }
     }
   }), _vm._v(" "), _c('div', {
@@ -13327,7 +13385,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }, [_c('span', {
       staticClass: "thread_title"
-    }, [_vm._v(_vm._s(thread.title))])])
+    }, [_vm._v(_vm._s(thread.id) + " - " + _vm._s(thread.title))])])
   }), _vm._v(" "), _c('div', {
     staticClass: "new_thread"
   }, [_c('a', {

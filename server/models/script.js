@@ -4,6 +4,7 @@ var db = require("../db.js");
 var Script = module.exports = db.sequelize.define("script", 
     {
         script: db.Sequelize.STRING(1024),
+        name: db.Sequelize.STRING(1024),
         active: db.Sequelize.BOOLEAN,
         runs_left: db.Sequelize.INTEGER,
         error_message: db.Sequelize.STRING(1024),
@@ -30,8 +31,6 @@ var router = require("../router.js");
 
 Thread.hasMany(Script);
 
-Script.sync();
-
 // routes
 
 router.get("/threads/:id/scripts/", (req, res) => {
@@ -45,7 +44,7 @@ router.get("/threads/:id/scripts/", (req, res) => {
 router.put("/threads/:thread_id/scripts/:id", (req, res) => {
 
     var values = {};
-    var allowedValues = ["active", "script"];
+    var allowedValues = ["active", "script", "name"];
 
     // filter toegestane attributen
     allowedValues.forEach(p => { 
@@ -54,7 +53,6 @@ router.put("/threads/:thread_id/scripts/:id", (req, res) => {
         }
     });
 
-    console.log(req.body);
     Script
         .findById(req.params.id)
         .then(script => {
@@ -68,7 +66,8 @@ router.put("/threads/:thread_id/scripts/:id", (req, res) => {
                 .then(s => {
                     res.status(200).json(s);
                 });
-        });
+        })
+        .catch(() => { console.error("script %s not found", req.params.id); });
 
 });
 
@@ -144,7 +143,7 @@ Script.Instance.prototype.run = function (message, threadId) {
         if (vm._context.output) {
             var output = vm._context.output.substring(0, 139);
             Message
-                .build({ message: output, threadId: threadId }) 
+                .build({ message: output, threadId: threadId, owner: 'script', scriptId: this.get("id") }) 
                 .save()
                 .then(() => { console.log('message added'); })
                 .catch((err) => { console.log(err); });
@@ -158,6 +157,9 @@ Script.Instance.prototype.run = function (message, threadId) {
             console.log("run_time", elapsed);
             console.log("runs_left: %s", this.runs_left);
             console.log(vm._context.output);
+        }
+        if (vm._context.star) {
+            message.update({ star: true });
         }
 
     }

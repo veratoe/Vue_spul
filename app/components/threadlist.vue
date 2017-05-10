@@ -1,7 +1,7 @@
 <template>
     <div class="thread_list">
         <div class="thread_list_item" v-for="thread in threads" @click="setActiveThreadId(thread.id)" :class="{ active: thread.id == activeThreadId }">
-            <span class="thread_title">{{ thread.title }}</span>
+            <span class="thread_title">{{ thread.id }} - {{ thread.title }}</span>
         </div> 
 
         <div class="new_thread">

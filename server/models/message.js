@@ -4,12 +4,19 @@ var db = require("../db");
 var Message = module.exports = db.sequelize.define("message", 
     {
         message: db.Sequelize.STRING,
+        owner: db.Sequelize.ENUM('user', 'script'),
+        star: db.Sequelize.BOOLEAN
     },
     {
         hooks: {
             afterCreate (instance, options) {
                 Message
-                    .findById(instance.dataValues.id, { include: [{ model: User, attributes: { exclude: ['password', 'salt'] }}]})
+                    .findById(instance.dataValues.id, 
+                        { include: [
+                            { model: User, attributes: ['username'] },
+                            { model: Script, attributes: ['name', ] }
+                        ]
+                    })
                     .then(m => {
 
                         console.log(m.toJSON());
@@ -20,6 +27,15 @@ var Message = module.exports = db.sequelize.define("message",
                     });
                 
 
+            },
+            afterUpdate (instance, options) {
+                Mutation.create({
+                    type: "UPDATE_MESSAGE",
+                    values: instance.dataValues,                                         
+                    previousValues: instance._previousValues,
+                    changed: instance._changed
+                });
+
             }
         }
     }
@@ -29,8 +45,10 @@ var router = require("../router.js");
 var Thread = require("./thread.js");
 var Mutation = require("./mutation.js");
 var User = require("./user.js");
+var Script = require("./script.js");
 
 Message.belongsTo(User);
+Message.belongsTo(Script);
 
 // REST routes
 router.get("/threads/:id/messages", (req, res) => {
@@ -55,7 +73,7 @@ router.post("/threads/:id/messages", (req, res) => {
                 return;
             }
 
-            Message.create({ message: req.body.message, threadId: req.params.id, userId: req.user.id })
+            Message.create({ message: req.body.message, threadId: req.params.id, userId: req.user.id, owner: 'user' })
                 .then(m => {
                     res.status(200).json(m);
 

@@ -16,7 +16,7 @@ Thread.hasMany(Message);
 router.get("/threads", (req, res) => {
 
     Thread
-        .findAll({ include: [ { model: Message, include: [User] }, Script ] }) 
+        .findAll({ include: [ { model: Message, include: [User, Script] }, Script ] }) 
         .then(threads => {
             res.json({ threads: threads });
         })

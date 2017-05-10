@@ -11,7 +11,8 @@
                 <strong v-else class="status_inactive" @click="activateScript">INACTIEF</strong>
             </span>
         </div>
-        <textarea class="script" v-model="script.script" />
+        <textarea class="script" v-model="script_script" />
+        <input v-model="script_name" />
         <div class="error">{{ script.error_message }}</div>
         <div cass="controls">
             <button @click="saveScript">Opslaan</button>
@@ -24,12 +25,21 @@
 <script>
 
     export default {
+        data: () => { return {
+            script_script: null,
+            script_name: null
+        }},
         props: { script: Object },
         computed: {
         },
         methods: {
             saveScript () {
-                this.$store.dispatch('saveScript', this.script); 
+                this.$store.dispatch('saveScript', { 
+                    threadId: this.script.threadId,
+                    id: this.script.id, 
+                    script: this.script_script, 
+                    name: this.script_name 
+                }); 
             },
             deleteScript() {
                 this.$store.dispatch('deleteScript', this.script.id); 
@@ -37,6 +47,10 @@
             activateScript() {
                 this.$store.dispatch('activateScript', this.script.id); 
             }
+        },
+        created () {
+            this.script_script = this.script.script;
+            this.script_name = this.script.name;
         }
     }
 

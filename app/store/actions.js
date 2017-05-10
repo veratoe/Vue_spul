@@ -78,6 +78,7 @@ export default {
     },
         
     saveScript({ commit, state }, payload) {
+        console.log(payload);
 
         $.ajax({
             url: "api/threads/" + state.activeThreadId + "/scripts/" + payload.id,
