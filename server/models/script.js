@@ -8,16 +8,19 @@ var Script = module.exports = db.sequelize.define("script",
         active: db.Sequelize.BOOLEAN,
         runs_left: db.Sequelize.INTEGER,
         error_message: db.Sequelize.STRING(1024),
-        last_run_time: db.Sequelize.FLOAT
+        last_run_time: db.Sequelize.FLOAT,
+        upvotes: db.Sequelize.INTEGER,
+        downvotes: db.Sequelize.INTEGER
     }, 
     {
         hooks: {
-            afterUpdate (instance, options, fn) {
+            afterUpdate (instance) {
+                console.log(instance.changed());
                 Mutation.create({ 
                     type: "UPDATE_SCRIPT",
                     values: instance.dataValues,
                     previousValues: instance._previousValues,
-                    changed: instance._changed
+                    changed: instance.changed()
                 });
             },
         }
@@ -106,7 +109,31 @@ router.delete("/threads/:thread_id/scripts/:script_id", (req, res) => {
 
 // hooks
 //
-    //
+
+router.get("/threads/:thread_id/scripts/:script_id/upvote", (req, res) => {
+
+    Script.findById(req.params.script_id)
+        .then(s => {
+            console.log('upping after found, %s', s.upvotes);
+            var upvotes = s.upvotes + 1;
+            console.log('setting to %s', upvotes);
+
+            s.update({ upvotes: upvotes })
+                .then((ss) => { 
+                    console.log('done');
+                    res.status(200).json(ss);
+                })
+                .catch(() => {
+                    console.log('error on upping');
+                    res.status(400).end();
+                });
+        })
+        .catch(() => {
+                    console.log('error on find');
+            res.status(400).end();
+        });
+});
+
 // instance methods
 Script.Instance.prototype.run = function (message, threadId) {
 

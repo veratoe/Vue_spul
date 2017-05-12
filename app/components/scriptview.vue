@@ -6,6 +6,8 @@
             <span class="created_at">created: {{ script.createdAt }}</span> | 
             <span>runs_left: {{ script.runs_left }} </span> |
             <span>last_run_time: {{ script.last_run_time }}</span> | 
+            <span>upvotes: {{ script.upvotes }}</span> | 
+            <span>downvotes: {{ script.downvotes }}</span> | 
             <span class="status">
                 <strong v-if="script.active">ACTIEF</strong>
                 <strong v-else class="status_inactive" @click="activateScript">INACTIEF</strong>

@@ -14,7 +14,7 @@ var Message = module.exports = db.sequelize.define("message",
                     .findById(instance.dataValues.id, 
                         { include: [
                             { model: User, attributes: ['username'] },
-                            { model: Script, attributes: ['name', ] }
+                            { model: Script, attributes: ['name' ] }
                         ]
                     })
                     .then(m => {

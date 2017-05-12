@@ -78,7 +78,6 @@ export default {
     },
         
     saveScript({ commit, state }, payload) {
-        console.log(payload);
 
         $.ajax({
             url: "api/threads/" + state.activeThreadId + "/scripts/" + payload.id,
@@ -96,7 +95,22 @@ export default {
     },
 
     /*
-     * Delete een draad
+     * upvote een script
+     * @param payload: scriptId
+     */    
+
+    upvoteScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload + "/upvote",
+            type: "GET",
+            contentType: "application/json",
+            success (script) {}
+        });
+    },
+
+    /*
+     * Delete een script
      * @param payload: scriptId
      */    
     

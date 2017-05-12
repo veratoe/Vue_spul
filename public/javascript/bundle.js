@@ -9121,7 +9121,6 @@ const getters = {
     },
 
     saveScript({ commit, state }, payload) {
-        console.log(payload);
 
         $.ajax({
             url: "api/threads/" + state.activeThreadId + "/scripts/" + payload.id,
@@ -9139,7 +9138,22 @@ const getters = {
     },
 
     /*
-     * Delete een draad
+     * upvote een script
+     * @param payload: scriptId
+     */
+
+    upvoteScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload + "/upvote",
+            type: "GET",
+            contentType: "application/json",
+            success(script) {}
+        });
+    },
+
+    /*
+     * Delete een script
      * @param payload: scriptId
      */
 
@@ -9773,9 +9787,9 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
         if (!thread) return;
         var script = thread.scripts.find(s => s.id === payload.values.id);
         if (!script) console.warn("Geen script voor :", payload.values);else {
-            for (var property in payload.changed) {
+            payload.changed.forEach(property => {
                 script[property] = payload.values[property];
-            }
+            });
         }
     },
 
@@ -9908,6 +9922,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
 
 
 
@@ -9930,6 +9948,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         scrollToBottom() {
             var $messages = $(".messages");
             if ($messages.length) $messages.animate({ scrollTop: $messages[0].scrollHeight });
+        },
+        upvote(scriptId) {
+            this.$store.dispatch("upvoteScript", scriptId);
+        },
+        downvote() {
+            this.$store.dispatch("downvoteScript", this.message.script);
         }
     },
     created() {
@@ -10043,6 +10067,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
 //
 //
 //
@@ -12145,7 +12171,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  margin-bottom: 10px;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  flex-direction: row;\n  display: flex;\n  position: relative;\n}\n.messages_view .messages .message_view .star {\n  position: absolute;\n  left: 6px;\n  color: yellow;\n  font-size: 23px;\n  top: 5px;\n}\n.messages_view .messages .message_view .user {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #c8dbf7;\n  text-align: right;\n}\n.messages_view .messages .message_view .script {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #ffffcc;\n  font-weight: bold;\n  text-align: right;\n}\n.messages_view .messages .message_view .body {\n  display: flex;\n  flex: 1 1 0;\n  padding: 8px;\n  background-color: #efefef;\n}\n.messages_view .messages .message_view .body .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .body .id {\n  width: 5%;\n  font-weight: bold;\n  color: #777;\n}\n.messages_view .messages .message_view .body .timestamp {\n  width: 20%;\n  text-align: right;\n  color: #999;\n}\n.messages_view .messages .message_view.star .body,\n.messages_view .messages .message_view.star .user,\n.messages_view .messages .message_view.star .script {\n  background: #888 !important;\n}\n.messages_view .messages .message_view.star .message {\n  color: yellow;\n  font-weight: bold;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
+exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  margin-bottom: 10px;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  flex-direction: row;\n  display: flex;\n  position: relative;\n}\n.messages_view .messages .message_view .star {\n  position: absolute;\n  left: 6px;\n  color: yellow;\n  font-size: 23px;\n  top: 5px;\n}\n.messages_view .messages .message_view .user {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #c8dbf7;\n  text-align: right;\n}\n.messages_view .messages .message_view .script {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #ffffcc;\n  font-weight: bold;\n  text-align: right;\n}\n.messages_view .messages .message_view .body {\n  display: flex;\n  flex: 1 1 0;\n  padding: 8px;\n  background-color: #efefef;\n}\n.messages_view .messages .message_view .body .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .body .id {\n  width: 5%;\n  font-weight: bold;\n  color: #777;\n}\n.messages_view .messages .message_view .body .timestamp {\n  width: 20%;\n  text-align: right;\n  color: #999;\n}\n.messages_view .messages .message_view .body .controls {\n  width: 12%;\n  margin-left: 26px;\n  text-align: right;\n}\n.messages_view .messages .message_view .body .controls * {\n  cursor: pointer;\n}\n.messages_view .messages .message_view.star .body,\n.messages_view .messages .message_view.star .user,\n.messages_view .messages .message_view.star .script {\n  background: #888 !important;\n}\n.messages_view .messages .message_view.star .message {\n  color: yellow;\n  font-weight: bold;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
 
 // exports
 
@@ -13078,7 +13104,21 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       staticClass: "id"
     }, [_vm._v(_vm._s(message.id))]), _vm._v(" "), _c('span', {
       staticClass: "timestamp"
-    }, [_vm._v(_vm._s(_vm._f("time_ago")((_vm.now - (new Date(message.createdAt)).getTime()) / 1000)) + " ")])])])
+    }, [_vm._v(_vm._s(_vm._f("time_ago")((_vm.now - (new Date(message.createdAt)).getTime()) / 1000)) + " ")]), _vm._v(" "), (message.owner == 'script') ? _c('span', {
+      staticClass: "controls"
+    }, [_c('span', {
+      staticClass: "upvote",
+      on: {
+        "click": function($event) {
+          _vm.upvote(message.scriptId)
+        }
+      }
+    }, [_vm._v("[^]")]), _vm._v(" "), _c('span', {
+      staticClass: "downvote",
+      on: {
+        "click": _vm.upvote
+      }
+    }, [_vm._v("[v]")])]) : _vm._e()])])
   })), _vm._v(" "), (_vm.logged_in) ? _c('MessageInput') : _vm._e()], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
@@ -13243,7 +13283,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "id"
   }, [_vm._v(_vm._s(_vm.script.id))]), _vm._v(" | \n        "), _c('span', {
     staticClass: "created_at"
-  }, [_vm._v("created: " + _vm._s(_vm.script.createdAt))]), _vm._v(" | \n        "), _c('span', [_vm._v("runs_left: " + _vm._s(_vm.script.runs_left) + " ")]), _vm._v(" |\n        "), _c('span', [_vm._v("last_run_time: " + _vm._s(_vm.script.last_run_time))]), _vm._v(" | \n        "), _c('span', {
+  }, [_vm._v("created: " + _vm._s(_vm.script.createdAt))]), _vm._v(" | \n        "), _c('span', [_vm._v("runs_left: " + _vm._s(_vm.script.runs_left) + " ")]), _vm._v(" |\n        "), _c('span', [_vm._v("last_run_time: " + _vm._s(_vm.script.last_run_time))]), _vm._v(" | \n        "), _c('span', [_vm._v("upvotes: " + _vm._s(_vm.script.upvotes))]), _vm._v(" | \n        "), _c('span', [_vm._v("downvotes: " + _vm._s(_vm.script.downvotes))]), _vm._v(" | \n        "), _c('span', {
     staticClass: "status"
   }, [(_vm.script.active) ? _c('strong', [_vm._v("ACTIEF")]) : _c('strong', {
     staticClass: "status_inactive",

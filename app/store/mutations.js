@@ -43,9 +43,9 @@ export default  {
         var script = thread.scripts.find(s => s.id === payload.values.id);
         if (!script) console.warn("Geen script voor :", payload.values);
         else {
-            for (var property in payload.changed) {
+            payload.changed.forEach(property => {
                 script[property] = payload.values[property];
-            }
+            });
         }
     },
 

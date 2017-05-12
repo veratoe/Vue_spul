@@ -9,6 +9,10 @@
                     <span class="message" >{{ message.message }}</span>
                     <span class="id">{{ message.id }}</span>
                     <span class="timestamp">{{ (now - (new Date(message.createdAt)).getTime()) / 1000 | time_ago  }} </span>
+                    <span class="controls" v-if="message.owner == 'script'">
+                        <span class="upvote" @click="upvote(message.scriptId)">[^]</span> 
+                        <span class="downvote" @click="upvote">[v]</span> 
+                    </span>
                 </div>
             </div>
         </div>
@@ -39,6 +43,12 @@
                 var $messages = $(".messages");
                 if ($messages.length)
                 $messages.animate({ scrollTop: $messages[0].scrollHeight });
+            },
+            upvote (scriptId) {
+                this.$store.dispatch("upvoteScript", scriptId);
+            },
+            downvote () {
+                this.$store.dispatch("downvoteScript", this.message.script);
             }
         },
         created () {
@@ -122,6 +132,15 @@
                         width: 20%;
                         text-align: right;
                         color: #999;
+                    }
+                    .controls {
+                        width: 12%;
+                        margin-left: 26px;
+                        text-align: right;
+                        
+                        * {
+                            cursor: pointer;
+                        }
                     }
                 }
 
