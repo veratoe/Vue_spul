@@ -30,8 +30,10 @@ var Script = module.exports = db.sequelize.define("script",
 var Thread = require("./thread.js");
 var Message = require("./message.js");
 var Mutation = require("./mutation.js");
+var Vote = require("./vote.js");
 var router = require("../router.js");
 
+Script.hasMany(Vote);
 Thread.hasMany(Script);
 
 // routes
@@ -112,26 +114,33 @@ router.delete("/threads/:thread_id/scripts/:script_id", (req, res) => {
 
 router.get("/threads/:thread_id/scripts/:script_id/upvote", (req, res) => {
 
-    Script.findById(req.params.script_id)
-        .then(s => {
-            console.log('upping after found, %s', s.upvotes);
-            var upvotes = s.upvotes + 1;
-            console.log('setting to %s', upvotes);
+    if (!req.authenticated) {
+        res.status(400).end();
+        return;
+    }
 
-            s.update({ upvotes: upvotes })
-                .then((ss) => { 
-                    console.log('done');
-                    res.status(200).json(ss);
+    Vote
+        .create({ scriptId: req.params.script_id, userId: req.user.id, type: 'up' })
+        .then(() => {
+            Script
+                .findAll({ 
+                    where: { id: req.params.script_id },
+                    include: [{
+                        model: Vote,
+                        attributes: []
+                    }],
+                    attributes: ['script.*', [db.sequelize.fn('COUNT', db.sequelize.col('votes.scriptId')), 'VoteCount']],
+                    group: [ 'script.id' ],
+                    logging: console.log,
+                    raw: true
                 })
-                .catch(() => {
-                    console.log('error on upping');
-                    res.status(400).end();
+                .then(s => {
+                    console.log(s);
+                    res.status(200).json(s);
                 });
-        })
-        .catch(() => {
-                    console.log('error on find');
-            res.status(400).end();
         });
+
+    
 });
 
 // instance methods

@@ -16,8 +16,10 @@ var User = module.exports = db.sequelize.define("user",
 
 var router = require("../router.js");
 var Message = require("./message.js");
+var Vote = require("./vote.js");
 
-User.hasMany(Message, { as: 'Messages' });
+User.hasMany(Message);
+User.hasMany(Vote);
 
 router.post("/users", (req, res) => {
 
