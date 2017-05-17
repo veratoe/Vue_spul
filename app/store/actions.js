@@ -110,6 +110,21 @@ export default {
     },
 
     /*
+     * downvote een script
+     * @param payload: scriptId
+     */    
+
+    downvoteScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload + "/downvote",
+            type: "GET",
+            contentType: "application/json",
+            success (script) {}
+        });
+    },
+
+    /*
      * Delete een script
      * @param payload: scriptId
      */    

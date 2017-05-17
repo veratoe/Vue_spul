@@ -9153,6 +9153,21 @@ const getters = {
     },
 
     /*
+     * downvote een script
+     * @param payload: scriptId
+     */
+
+    downvoteScript({ commit, state }, payload) {
+
+        $.ajax({
+            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload + "/downvote",
+            type: "GET",
+            contentType: "application/json",
+            success(script) {}
+        });
+    },
+
+    /*
      * Delete een script
      * @param payload: scriptId
      */
@@ -9952,8 +9967,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         upvote(scriptId) {
             this.$store.dispatch("upvoteScript", scriptId);
         },
-        downvote() {
-            this.$store.dispatch("downvoteScript", this.message.script);
+        downvote(scriptId) {
+            this.$store.dispatch("downvoteScript", scriptId);
         }
     },
     created() {
@@ -13116,7 +13131,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [_vm._v("[^]")]), _vm._v(" "), _c('span', {
       staticClass: "downvote",
       on: {
-        "click": _vm.upvote
+        "click": function($event) {
+          _vm.downvote(message.scriptId)
+        }
       }
     }, [_vm._v("[v]")])]) : _vm._e()])])
   })), _vm._v(" "), (_vm.logged_in) ? _c('MessageInput') : _vm._e()], 1)

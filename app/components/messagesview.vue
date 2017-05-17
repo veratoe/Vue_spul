@@ -11,7 +11,7 @@
                     <span class="timestamp">{{ (now - (new Date(message.createdAt)).getTime()) / 1000 | time_ago  }} </span>
                     <span class="controls" v-if="message.owner == 'script'">
                         <span class="upvote" @click="upvote(message.scriptId)">[^]</span> 
-                        <span class="downvote" @click="upvote">[v]</span> 
+                        <span class="downvote" @click="downvote(message.scriptId)">[v]</span> 
                     </span>
                 </div>
             </div>
@@ -47,8 +47,8 @@
             upvote (scriptId) {
                 this.$store.dispatch("upvoteScript", scriptId);
             },
-            downvote () {
-                this.$store.dispatch("downvoteScript", this.message.script);
+            downvote (scriptId) {
+                this.$store.dispatch("downvoteScript", scriptId);
             }
         },
         created () {

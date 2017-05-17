@@ -9,13 +9,11 @@ var Script = module.exports = db.sequelize.define("script",
         runs_left: db.Sequelize.INTEGER,
         error_message: db.Sequelize.STRING(1024),
         last_run_time: db.Sequelize.FLOAT,
-        upvotes: db.Sequelize.INTEGER,
-        downvotes: db.Sequelize.INTEGER
     }, 
     {
         hooks: {
             afterUpdate (instance) {
-                console.log(instance.changed());
+
                 Mutation.create({ 
                     type: "UPDATE_SCRIPT",
                     values: instance.dataValues,
@@ -40,7 +38,17 @@ Thread.hasMany(Script);
 
 router.get("/threads/:id/scripts/", (req, res) => {
 
-    Script.findAll({ where: { threadId : req.params.id }})
+    Script
+        .findAll({ 
+            where: { threadId : req.params.id },
+            include: [{
+                model: Vote,
+                attributes: []
+            }],
+            attributes: ['script.*', [db.sequelize.fn('COUNT', db.sequelize.col('votes.scriptId')), 'upvotes']],
+            group: [ 'script.id' ],
+            raw: true
+        })
         .then(scripts => {
             res.status(200).json(scripts);
         });
@@ -120,26 +128,41 @@ router.get("/threads/:thread_id/scripts/:script_id/upvote", (req, res) => {
     }
 
     Vote
-        .create({ scriptId: req.params.script_id, userId: req.user.id, type: 'up' })
-        .then(() => {
-            Script
-                .findAll({ 
-                    where: { id: req.params.script_id },
-                    include: [{
-                        model: Vote,
-                        attributes: []
-                    }],
-                    attributes: ['script.*', [db.sequelize.fn('COUNT', db.sequelize.col('votes.scriptId')), 'VoteCount']],
-                    group: [ 'script.id' ],
-                    logging: console.log,
-                    raw: true
-                })
-                .then(s => {
-                    console.log(s);
-                    res.status(200).json(s);
-                });
-        });
+        .findOrCreate({ where: { scriptId: req.params.script_id, userId: req.user.id  }, defaults: { type: 'up' }})
+        .spread((v, created) => {
+            if (created) {
+                res.status(200).json(v);
+                return;
+            }
 
+            v.update({ type: 'up' })
+                .then(_v => {
+                        res.status(200).json(_v);
+                    });
+        });
+    
+});
+
+router.get("/threads/:thread_id/scripts/:script_id/downvote", (req, res) => {
+
+    if (!req.authenticated) {
+        res.status(400).end();
+        return;
+    }
+
+    Vote
+        .findOrCreate({ where: { scriptId: req.params.script_id, userId: req.user.id  }, defaults: { type: 'down' }})
+        .spread((v, created) => {
+            if (created) {
+                res.status(200).json(v);
+                return;
+            }
+
+            v.update({ type: 'down' })
+                .then(_v => {
+                        res.status(200).json(_v);
+                    });
+        });
     
 });
 
