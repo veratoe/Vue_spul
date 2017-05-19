@@ -27,16 +27,10 @@ router.get("/threads", (req, res) => {
             },  
             {
                 model: Script, 
-                include: [
-                    // puur voor d'n counting
-                    { model: Vote, attributes: ['type'], }
-                ],   
-                attributes: { include: 
-                    [[db.sequelize.fn('COUNT(type)', db.sequelize.col('scripts.votes.scriptId')), 'upvotes']] 
-                },
+                attributes: ['id', [db.sequelize.literal(
+                    '(select count(*) from votes where "scriptId" = "scripts"."id" AND type = \'up\')'), 'upvotes']] 
 
             }],
-            group: [ 'scripts.id', 'thread.id', 'messages.id', 'messages.user.id', 'messages.script.id', 'scripts.votes.id' ],
         }) 
         .then(threads => {
             res.json({ threads: threads });

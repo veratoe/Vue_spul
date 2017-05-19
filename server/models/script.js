@@ -41,13 +41,8 @@ router.get("/threads/:id/scripts/", (req, res) => {
     Script
         .findAll({ 
             where: { threadId : req.params.id },
-            include: [{
-                model: Vote,
-                attributes: []
-            }],
-            attributes: ['script.*', [db.sequelize.fn('COUNT', db.sequelize.col('votes.scriptId')), 'upvotes']],
-            group: [ 'script.id' ],
-            raw: true
+            attributes: ['id', [db.sequelize.literal(
+                '(select count(*) from votes where "scriptId" = "scripts"."id" AND type = \'up\')'), 'upvotes']] 
         })
         .then(scripts => {
             res.status(200).json(scripts);
