@@ -2,7 +2,7 @@
 
     <div class="thread_view">
         <div class="header">
-            <span class="title">{{ thread.title }}</span> <span class="delete_thread" @click="deleteThread">[X]</span>
+            <span class="title">{{ thread.title }}</span> <span v-if="thread.dead">&#10014;</span><span class="delete_thread" @click="deleteThread">[X]</span>
             <div class="tabs">
                 <span class="tab" @click="subView = 'messages'" :class="{ selected: subView == 'messages' }">Berichten</span>
                 <span class="tab" @click="subView = 'scripts'" :class="{ selected: subView == 'scripts' }">Scripts</span>

@@ -1,7 +1,7 @@
 <template>
     <div class="thread_list">
-        <div class="thread_list_item" v-for="thread in threads" @click="setActiveThreadId(thread.id)" :class="{ active: thread.id == activeThreadId }">
-            <span class="thread_title">{{ thread.id }} - {{ thread.title }}</span>
+        <div class="thread_list_item" v-for="thread in threads" @click="setActiveThreadId(thread.id)" :class="{ active: thread.id == activeThreadId, dead: thread.dead }">
+            <span class="thread_title">{{ thread.id }} - {{ thread.title }}</span><span v-if="thread.dead">&#10014;</span>
         </div> 
 
         <div class="new_thread">
@@ -63,6 +63,11 @@
             color: blue;
             text-decoration: underline;
         }
+
+        &.dead {
+            text-decoration: line-through;
+            color: #999;
+        }   
 
         span.thread_title {
             &:hover {

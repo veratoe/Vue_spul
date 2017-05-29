@@ -3,6 +3,7 @@ var db = require("../db");
 // define model
 var Thread = module.exports = db.sequelize.define("thread", {
     title: db.Sequelize.STRING,
+    dead: db.Sequelize.BOOLEAN
 });
 
 var router = require("../router.js");
@@ -12,6 +13,17 @@ var User = require("./user");
 var Vote = require("./vote");
 
 Thread.hasMany(Message);
+
+
+Thread.Instance.prototype.kill = function () {
+     
+    Message.create({ message: "Thread was killed", threadId: this.get("id"), owner: "system" }); 
+
+    this
+        .update({ dead: true })
+        .then(() => { console.log("thread %s killed", this.get("id")); });
+
+};
 
 // routes
 router.get("/threads", (req, res) => {

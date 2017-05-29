@@ -9892,6 +9892,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -9902,7 +9903,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         };
     },
 
+    computed: {
+        charactersLeft() {
+            return 140 - (this.text || "").length;
+        }
+    },
+
     methods: {
+        keydown: function (event) {
+            if (this.charactersLeft < 130) event.preventDefault();
+        },
         sendMessage() {
             this.$store.dispatch('sendMessage', this.text);
             this.text = null;
@@ -9919,6 +9929,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__messageinput_vue__ = __webpack_require__(38);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__messageinput_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__messageinput_vue__);
+//
 //
 //
 //
@@ -12186,7 +12197,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  margin-bottom: 10px;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  flex-direction: row;\n  display: flex;\n  position: relative;\n}\n.messages_view .messages .message_view .star {\n  position: absolute;\n  left: 6px;\n  color: yellow;\n  font-size: 23px;\n  top: 5px;\n}\n.messages_view .messages .message_view .user {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #c8dbf7;\n  text-align: right;\n}\n.messages_view .messages .message_view .script {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #ffffcc;\n  font-weight: bold;\n  text-align: right;\n}\n.messages_view .messages .message_view .body {\n  display: flex;\n  flex: 1 1 0;\n  padding: 8px;\n  background-color: #efefef;\n}\n.messages_view .messages .message_view .body .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .body .id {\n  width: 5%;\n  font-weight: bold;\n  color: #777;\n}\n.messages_view .messages .message_view .body .timestamp {\n  width: 20%;\n  text-align: right;\n  color: #999;\n}\n.messages_view .messages .message_view .body .controls {\n  width: 12%;\n  margin-left: 26px;\n  text-align: right;\n}\n.messages_view .messages .message_view .body .controls * {\n  cursor: pointer;\n}\n.messages_view .messages .message_view.star .body,\n.messages_view .messages .message_view.star .user,\n.messages_view .messages .message_view.star .script {\n  background: #888 !important;\n}\n.messages_view .messages .message_view.star .message {\n  color: yellow;\n  font-weight: bold;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
+exports.push([module.i, "\n.messages_view {\n  display: flex;\n  flex-direction: column;\n  height: 100%;\n}\n.messages_view .messages {\n  flex: 1 1 0;\n  margin-bottom: 10px;\n  overflow-y: scroll;\n}\n.messages_view .messages .message_view {\n  flex-direction: row;\n  display: flex;\n  position: relative;\n}\n.messages_view .messages .message_view .star {\n  position: absolute;\n  left: 6px;\n  color: yellow;\n  font-size: 23px;\n  top: 5px;\n}\n.messages_view .messages .message_view .user {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n  background-color: #c8dbf7;\n  text-align: right;\n}\n.messages_view .messages .message_view .owner {\n  flex: 0 1 120px;\n  width: 10%;\n  padding: 8px;\n}\n.messages_view .messages .message_view .owner.script {\n  background-color: #ffffcc;\n  font-weight: bold;\n  text-align: right;\n}\n.messages_view .messages .message_view .owner.system {\n  background-color: white;\n}\n.messages_view .messages .message_view .body {\n  display: flex;\n  flex: 1 1 0;\n  padding: 8px;\n  background-color: #efefef;\n}\n.messages_view .messages .message_view .body .message {\n  width: 60%;\n}\n.messages_view .messages .message_view .body .message.system {\n  color: #aaa;\n}\n.messages_view .messages .message_view .body .id {\n  width: 5%;\n  font-weight: bold;\n  color: #777;\n}\n.messages_view .messages .message_view .body .timestamp {\n  width: 20%;\n  text-align: right;\n  color: #999;\n}\n.messages_view .messages .message_view .body .controls {\n  width: 12%;\n  margin-left: 26px;\n  text-align: right;\n}\n.messages_view .messages .message_view .body .controls * {\n  cursor: pointer;\n}\n.messages_view .messages .message_view.star .body,\n.messages_view .messages .message_view.star .user,\n.messages_view .messages .message_view.star .script {\n  background: #888 !important;\n}\n.messages_view .messages .message_view.star .message {\n  color: yellow;\n  font-weight: bold;\n}\n.messages_view .message_input {\n  flex: 0 1 10vh;\n  height: 150px;\n}\n", ""]);
 
 // exports
 
@@ -12270,7 +12281,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.thread_list {\n  background-color: #f0f0f0;\n  width: 25%;\n  height: 100%;\n  border-right: 2px solid #ccc;\n}\n.thread_list .thread_list_item {\n  padding: 4px;\n}\n.thread_list .thread_list_item.active {\n  font-weight: bold;\n  color: blue;\n  text-decoration: underline;\n}\n.thread_list .thread_list_item span.thread_title:hover {\n  cursor: pointer;\n  text-decoration: underline;\n}\n", ""]);
+exports.push([module.i, "\n.thread_list {\n  background-color: #f0f0f0;\n  width: 25%;\n  height: 100%;\n  border-right: 2px solid #ccc;\n}\n.thread_list .thread_list_item {\n  padding: 4px;\n}\n.thread_list .thread_list_item.active {\n  font-weight: bold;\n  color: blue;\n  text-decoration: underline;\n}\n.thread_list .thread_list_item.dead {\n  text-decoration: line-through;\n  color: #999;\n}\n.thread_list .thread_list_item span.thread_title:hover {\n  cursor: pointer;\n  text-decoration: underline;\n}\n", ""]);
 
 // exports
 
@@ -13108,13 +13119,18 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }, [(message.star) ? _c('span', {
       staticClass: "star"
     }, [_vm._v("*")]) : _vm._e(), _vm._v(" "), (message.owner == 'user') ? _c('div', {
-      staticClass: "user"
+      staticClass: "owner user"
     }, [_vm._v(_vm._s(message.user && message.user.username))]) : _vm._e(), _vm._v(" "), (message.owner == 'script') ? _c('div', {
-      staticClass: "script"
-    }, [_vm._v(_vm._s(message.script && message.script.name))]) : _vm._e(), _vm._v(" "), _c('div', {
+      staticClass: "owner script"
+    }, [_vm._v(_vm._s(message.script && message.script.name))]) : _vm._e(), _vm._v(" "), (message.owner == 'system') ? _c('div', {
+      staticClass: "owner system"
+    }) : _vm._e(), _vm._v(" "), _c('div', {
       staticClass: "body"
     }, [_c('span', {
-      staticClass: "message"
+      staticClass: "message",
+      class: {
+        'system': message.owner == 'system'
+      }
     }, [_vm._v(_vm._s(message.message))]), _vm._v(" "), _c('span', {
       staticClass: "id"
     }, [_vm._v(_vm._s(message.id))]), _vm._v(" "), _c('span', {
@@ -13263,10 +13279,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "value": (_vm.text)
     },
     on: {
-      "keyup": function($event) {
-        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
-        _vm.sendMessage($event)
-      },
+      "keydown": _vm.keydown,
       "input": function($event) {
         if ($event.target.composing) { return; }
         _vm.text = $event.target.value
@@ -13277,7 +13290,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": _vm.sendMessage
     }
-  }, [_vm._v("Stuur")])])
+  }, [_vm._v("Stuur")]), _vm._v(" "), _c('div', {
+    staticClass: "characters"
+  }, [_vm._v(" " + _vm._s(_vm.charactersLeft) + " / 140 ")])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -13375,7 +13390,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "header"
   }, [_c('span', {
     staticClass: "title"
-  }, [_vm._v(_vm._s(_vm.thread.title))]), _vm._v(" "), _c('span', {
+  }, [_vm._v(_vm._s(_vm.thread.title))]), _vm._v(" "), (_vm.thread.dead) ? _c('span', [_vm._v("✞")]) : _vm._e(), _c('span', {
     staticClass: "delete_thread",
     on: {
       "click": _vm.deleteThread
@@ -13433,7 +13448,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     return _c('div', {
       staticClass: "thread_list_item",
       class: {
-        active: thread.id == _vm.activeThreadId
+        active: thread.id == _vm.activeThreadId, dead: thread.dead
       },
       on: {
         "click": function($event) {
@@ -13442,7 +13457,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }, [_c('span', {
       staticClass: "thread_title"
-    }, [_vm._v(_vm._s(thread.id) + " - " + _vm._s(thread.title))])])
+    }, [_vm._v(_vm._s(thread.id) + " - " + _vm._s(thread.title))]), (thread.dead) ? _c('span', [_vm._v("✞")]) : _vm._e()])
   }), _vm._v(" "), _c('div', {
     staticClass: "new_thread"
   }, [_c('a', {

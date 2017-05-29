@@ -4,7 +4,7 @@ var db = require("../db");
 var Message = module.exports = db.sequelize.define("message", 
     {
         message: db.Sequelize.STRING,
-        owner: db.Sequelize.ENUM('user', 'script'),
+        owner: db.Sequelize.ENUM('user', 'script', 'system'),
         star: db.Sequelize.BOOLEAN
     },
     {
@@ -68,7 +68,7 @@ router.post("/threads/:id/messages", (req, res) => {
 
     Thread.findById(req.params.id)
         .then(thread => {
-            if (!thread) {  
+            if (!thread || thread.get("dead")) {  
                 res.status(400).send();
                 return;
             }

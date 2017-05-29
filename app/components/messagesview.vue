@@ -3,10 +3,11 @@
         <div class="messages">
             <div class="message_view" v-for="message in messages" :key=message.id :class="{ 'star': message.star }">
                 <span class="star" v-if="message.star">*</span>
-                <div v-if="message.owner == 'user'" class="user">{{ message.user && message.user.username }}</div>
-                <div v-if="message.owner == 'script'" class="script">{{ message.script && message.script.name }}</div>
+                <div v-if="message.owner == 'user'" class="owner user">{{ message.user && message.user.username }}</div>
+                <div v-if="message.owner == 'script'" class="owner script">{{ message.script && message.script.name }}</div>
+                <div v-if="message.owner == 'system'" class="owner system"></div>
                 <div class="body">
-                    <span class="message" >{{ message.message }}</span>
+                    <span class="message" :class="{ 'system': message.owner == 'system' }">{{ message.message }}</span>
                     <span class="id">{{ message.id }}</span>
                     <span class="timestamp">{{ (now - (new Date(message.createdAt)).getTime()) / 1000 | time_ago  }} </span>
                     <span class="controls" v-if="message.owner == 'script'">
@@ -103,14 +104,21 @@
                     text-align: right;
                 }
 
-                .script {
+                .owner {
                     flex: 0 1 120px; 
                     width: 10%;
                     padding: 8px;
-                    background-color: #ffffcc;
-                    font-weight: bold;
-                    text-align: right;
-                }
+
+                    &.script {
+                        background-color: #ffffcc;
+                        font-weight: bold;
+                        text-align: right;
+                    }
+
+                    &.system {
+                        background-color: white;
+                    }
+                } 
 
                 .body {
                     display: flex;
@@ -121,6 +129,10 @@
 
                     .message {
                         width: 60%;
+
+                        &.system {
+                            color: #aaa;
+                        }
                     }
 
                     .id {

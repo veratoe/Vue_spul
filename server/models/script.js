@@ -216,6 +216,10 @@ Script.Instance.prototype.run = function (message, threadId) {
             message.update({ star: true });
         }
 
+        if (vm._context.dead) {
+            Thread.findById(threadId).then(t => { t.kill(); });
+        }
+
     }
 
 };

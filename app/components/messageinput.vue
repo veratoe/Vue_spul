@@ -1,8 +1,9 @@
 <template>
 
     <div class="message_input">
-        <textarea v-model="text" @keyup.enter="sendMessage"></textarea>
+        <textarea v-model="text" @keydown="keydown"></textarea>
         <div class="submit" @click="sendMessage">Stuur</div>
+        <div class="characters"> {{ charactersLeft }} / 140 </div>
     </div>
 
 </template>
@@ -17,7 +18,16 @@
             }
         },
 
+        computed: {
+            charactersLeft () {
+                return 140 - (this.text || "").length;
+            }
+        },
+
         methods: {
+            keydown: function (event) {
+                if (this.charactersLeft < 130) event.preventDefault();
+            },
             sendMessage () {
                 this.$store.dispatch('sendMessage', this.text); 
                 this.text = null
@@ -58,6 +68,9 @@
             &:hover {
                 background-color: #6d77f3;
             }
+        }
+
+        .characters {
         }
     }
 
