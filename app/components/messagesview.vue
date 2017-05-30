@@ -17,7 +17,7 @@
                 </div>
             </div>
         </div>
-        <MessageInput v-if="logged_in"></MessageInput>
+        <MessageInput v-if="logged_in && !thread.dead"></MessageInput>
     </div>
 </template>
 
@@ -28,7 +28,7 @@
     export default {
         name: "MessagesView",
         components: { MessageInput },
-        props: { messages: Array },
+        props: { thread: Object, messages: Array },
         data () {
             return {
                 now: Date.now()

@@ -15,17 +15,30 @@ setInterval(() => {
                 mutationHandle = m.id;
 
                 console.log(m);
+
                 switch(m.type) {
+                    case "CREATE_THREAD":
+                        store.commit("CREATE_THREAD", m);
+                        break;
+                    case "UPDATE_THREAD":
+                        store.commit("UPDATE_THREAD", m);
+                        break;
+
+                    case "CREATE_SCRIPT": 
+                        store.commit("CREATE_SCRIPT", m);
+                        break;
+
                     case "UPDATE_SCRIPT": 
                         store.commit("UPDATE_SCRIPT", m);
-                    break;
+                        break;
 
                     case "CREATE_MESSAGE": 
                         store.commit("CREATE_MESSAGE", m);
-                    break;
+                        break;
 
                     case "UPDATE_MESSAGE":
                         store.commit("UPDATE_MESSAGE", m);
+                        break;
                 }
 
             });

@@ -1,13 +1,40 @@
 var db = require("../db");
 
 // define model
-var Thread = module.exports = db.sequelize.define("thread", {
-    title: db.Sequelize.STRING,
-    dead: db.Sequelize.BOOLEAN
-});
+var Thread = module.exports = db.sequelize.define("thread", 
+    {
+        title: db.Sequelize.STRING,
+        dead: db.Sequelize.BOOLEAN,
+    },
+    {
+        hooks: {
+            afterCreate (instance, options) {
+                Thread
+                    .findById(instance.dataValues.id, { include: [Script] }) 
+                    .then(t => {
+
+                        Mutation.create({
+                            type: "CREATE_THREAD",
+                            values: t.dataValues                                         
+                        });
+                    });
+            },
+            afterUpdate (instance, options) {
+                Mutation.create({
+                    type: "UPDATE_THREAD",
+                    values: instance.dataValues,                                         
+                    previousValues: instance._previousValues,
+                    changed: instance._changed
+                });
+
+            }
+        }
+    }
+);
 
 var router = require("../router.js");
 var Message = require("./message");
+var Mutation = require("./mutation");
 var Script = require("./script");
 var User = require("./user");
 var Vote = require("./vote");
@@ -39,8 +66,9 @@ router.get("/threads", (req, res) => {
             },  
             {
                 model: Script, 
-                attributes: ['id', [db.sequelize.literal(
-                    '(select count(*) from votes where "scriptId" = "scripts"."id" AND type = \'up\')'), 'upvotes']] 
+                attributes: ['id', 'script', 'name', 'active', 'runs_left', 'error_message', 'last_run_time',
+                    [db.sequelize.literal('(select count(*) from votes where "scriptId" = "scripts"."id" AND type = \'up\')'), 'upvotes'] 
+                ]
 
             }],
         }) 

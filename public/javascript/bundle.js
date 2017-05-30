@@ -9045,7 +9045,14 @@ const getters = {
 "use strict";
 /* harmony default export */ __webpack_exports__["a"] = ({
 
+    /*
+     *      Let op: actions moeten zo min mogelijk commits doen die eigenlijk vanuit de server
+     *      kunnen worden gestuurd; laat de server leidend zijn!
+     *     
+     */
+
     // @APPELMOES: Ajax spul naar api.js
+
     fetchThreads({ commit }) {
 
         $.ajax({
@@ -9068,7 +9075,7 @@ const getters = {
             type: "POST",
             data: JSON.stringify({ message: payload }),
             contentType: "application/json",
-            success: message => {}
+            success: () => {}
         });
     },
 
@@ -9084,10 +9091,7 @@ const getters = {
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
-            success: thread => {
-                thread.messages = []; // @APPELMOES: is dit goed?
-                commit("CREATE_THREAD", thread);
-            }
+            success: () => {}
         });
     },
 
@@ -9102,7 +9106,6 @@ const getters = {
             url: "api/threads/" + payload,
             type: "DELETE",
             success: () => {
-                commit("DELETE_THREAD", payload);
                 commit("SET_ACTIVE_THREAD_ID", null);
             }
         });
@@ -9114,9 +9117,7 @@ const getters = {
 
             url: "api/threads/" + state.activeThreadId + "/scripts/",
             type: "POST",
-            success(script) {
-                commit("CREATE_SCRIPT", script);
-            }
+            success(script) {}
         });
     },
 
@@ -9127,14 +9128,8 @@ const getters = {
             type: "PUT",
             data: JSON.stringify(payload),
             contentType: "application/json",
-            success(script) {
-                commit("UPDATE_SCRIPT", script);
-            }
+            success(script) {}
         });
-    },
-
-    receiveScript({ commit, state }, payload) {
-        commit("UPDATE_SCRIPT", payload);
     },
 
     /*
@@ -9610,7 +9605,19 @@ setInterval(() => {
                 mutationHandle = m.id;
 
                 console.log(m);
+
                 switch (m.type) {
+                    case "CREATE_THREAD":
+                        __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("CREATE_THREAD", m);
+                        break;
+                    case "UPDATE_THREAD":
+                        __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("UPDATE_THREAD", m);
+                        break;
+
+                    case "CREATE_SCRIPT":
+                        __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("CREATE_SCRIPT", m);
+                        break;
+
                     case "UPDATE_SCRIPT":
                         __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("UPDATE_SCRIPT", m);
                         break;
@@ -9621,6 +9628,7 @@ setInterval(() => {
 
                     case "UPDATE_MESSAGE":
                         __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("UPDATE_MESSAGE", m);
+                        break;
                 }
             });
         }
@@ -9763,20 +9771,34 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
 
 /* harmony default export */ __webpack_exports__["a"] = ({
 
+    /*
+     *      thread
+     */
+
     RECEIVE_THREADS(state, threads) {
         state.threads = threads;
     },
-    CREATE_THREAD(state, thread) {
-        state.threads.push(thread);
+    CREATE_THREAD(state, payload) {
+        state.threads.push(payload.values);
     },
     DELETE_THREAD(state, threadId) {
         var index = state.threads.findIndex(t => t.id === threadId);
         state.threads.splice(index, 1);
     },
+    UPDATE_THREAD(state, payload) {
+        var thread = state.threads.find(t => t.id === payload.values.id);
+        for (var property in payload.changed) {
+            thread[property] = payload.values[property];
+        };
+    },
 
     SET_ACTIVE_THREAD_ID(state, threadId) {
         state.activeThreadId = threadId;
     },
+
+    /*
+     *      message
+     */
 
     CREATE_MESSAGE(state, payload) {
         var thread = state.threads.find(t => t.id === payload.values.threadId);
@@ -9786,25 +9808,30 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
     UPDATE_MESSAGE(state, payload) {
         var thread = state.threads.find(t => t.id === payload.values.threadId);
         var message = thread.messages.find(m => m.id === payload.values.id);
-        ["star"].forEach(property => {
+        for (var property in payload.changed) {
             message[property] = payload.values[property];
-        });
+        };
     },
 
-    CREATE_SCRIPT(state, script) {
-        var thread = __WEBPACK_IMPORTED_MODULE_0__getters_js__["a" /* default */].getActiveThread(state);
-        thread.scripts.push(script);
+    /*
+     *      script
+     */
+
+    CREATE_SCRIPT(state, payload) {
+        var thread = state.threads.find(t => t.id === payload.values.threadId);
+        thread.scripts.push(payload.values);
     },
 
     UPDATE_SCRIPT(state, payload) {
+        console.log(payload);
         // @TODO: platslaan resources
         var thread = state.threads.find(t => t.id === payload.values.threadId);
         if (!thread) return;
         var script = thread.scripts.find(s => s.id === payload.values.id);
         if (!script) console.warn("Geen script voor :", payload.values);else {
-            payload.changed.forEach(property => {
+            for (var property in payload.changed) {
                 script[property] = payload.values[property];
-            });
+            };
         }
     },
 
@@ -9813,6 +9840,10 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
         var index = thread.scripts.findIndex(s => s.id === scriptId);
         thread.scripts.splice(index, 1);
     },
+
+    /*
+     *      login
+     */
 
     LOGIN(state, user) {
         state.logged_in = true;
@@ -9959,7 +9990,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony default export */ __webpack_exports__["default"] = ({
     name: "MessagesView",
     components: { MessageInput: __WEBPACK_IMPORTED_MODULE_0__messageinput_vue___default.a },
-    props: { messages: Array },
+    props: { thread: Object, messages: Array },
     data() {
         return {
             now: Date.now()
@@ -12267,7 +12298,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.thread_view {\n  width: 75%;\n  padding: 20px;\n  display: flex;\n  flex-direction: column;\n}\n.thread_view .header {\n  flex: 0 0 50px;\n}\n.thread_view .header .title {\n  font-size: 32px;\n  color: #888;\n}\n.thread_view .header .delete_thread {\n  cursor: pointer;\n}\n.thread_view .header .delete_thread:hover {\n  color: red;\n}\n.thread_view .header .tabs {\n  float: right;\n}\n.thread_view .header .tabs .tab {\n  cursor: pointer;\n}\n.thread_view .header .tabs .tab:hover {\n  color: blue;\n}\n.thread_view .header .tabs .tab.selected {\n  text-decoration: underline;\n}\n.thread_view .sub_view {\n  flex: 1 1 0;\n}\n", ""]);
+exports.push([module.i, "\n.thread_view {\n  width: 75%;\n  padding: 20px;\n  display: flex;\n  flex-direction: column;\n}\n.thread_view .header {\n  flex: 0 0 50px;\n}\n.thread_view .header .title {\n  font-size: 32px;\n  color: #888;\n}\n.thread_view .header .title.dead {\n  text-decoration: line-through;\n  color: #aaa;\n}\n.thread_view .header .cross {\n  font-size: 40px;\n}\n.thread_view .header .delete_thread {\n  cursor: pointer;\n}\n.thread_view .header .delete_thread:hover {\n  color: red;\n}\n.thread_view .header .tabs {\n  float: right;\n}\n.thread_view .header .tabs .tab {\n  cursor: pointer;\n}\n.thread_view .header .tabs .tab:hover {\n  color: blue;\n}\n.thread_view .header .tabs .tab.selected {\n  text-decoration: underline;\n}\n.thread_view .sub_view {\n  flex: 1 1 0;\n}\n", ""]);
 
 // exports
 
@@ -13152,7 +13183,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         }
       }
     }, [_vm._v("[v]")])]) : _vm._e()])])
-  })), _vm._v(" "), (_vm.logged_in) ? _c('MessageInput') : _vm._e()], 1)
+  })), _vm._v(" "), (_vm.logged_in && !_vm.thread.dead) ? _c('MessageInput') : _vm._e()], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -13389,8 +13420,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('div', {
     staticClass: "header"
   }, [_c('span', {
-    staticClass: "title"
-  }, [_vm._v(_vm._s(_vm.thread.title))]), _vm._v(" "), (_vm.thread.dead) ? _c('span', [_vm._v("✞")]) : _vm._e(), _c('span', {
+    staticClass: "title",
+    class: {
+      'dead': _vm.thread.dead
+    }
+  }, [_vm._v(_vm._s(_vm.thread.title))]), _vm._v(" "), (_vm.thread.dead) ? _c('span', {
+    staticClass: "cross"
+  }, [_vm._v("✞")]) : _vm._e(), _c('span', {
     staticClass: "delete_thread",
     on: {
       "click": _vm.deleteThread
@@ -13421,7 +13457,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "sub_view"
   }, [(_vm.subView == 'messages') ? _c('MessagesView', {
     attrs: {
-      "messages": _vm.thread.messages
+      "messages": _vm.thread.messages,
+      "thread": _vm.thread
     }
   }) : _vm._e(), _vm._v(" "), (_vm.subView == 'scripts') ? _c('ScriptsView', {
     attrs: {

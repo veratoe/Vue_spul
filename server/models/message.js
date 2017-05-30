@@ -18,8 +18,6 @@ var Message = module.exports = db.sequelize.define("message",
                         ]
                     })
                     .then(m => {
-
-                        console.log(m.toJSON());
                         Mutation.create({
                             type: "CREATE_MESSAGE",
                             values: m.dataValues                                         
@@ -49,6 +47,18 @@ var Script = require("./script.js");
 
 Message.belongsTo(User);
 Message.belongsTo(Script);
+
+Message.Instance.prototype.addStar = function () {
+
+    this.getUser().then(u => {
+    
+        this
+            .update({ star: true })
+            .then(m => {
+                Message.create({ message: u.get("username") + " got a star for that", threadId: this.get("threadId"), owner: "system" }); 
+            });
+    });
+};
 
 // REST routes
 router.get("/threads/:id/messages", (req, res) => {

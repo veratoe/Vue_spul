@@ -12,6 +12,16 @@ var Script = module.exports = db.sequelize.define("script",
     }, 
     {
         hooks: {
+            afterCreate (instance, options) {
+                Script
+                    .findById(instance.dataValues.id) 
+                    .then(s => {
+                        Mutation.create({
+                            type: "CREATE_SCRIPT",
+                            values: s.dataValues                                         
+                        });
+                    });
+            },
             afterUpdate (instance) {
 
                 Mutation.create({ 
@@ -176,14 +186,12 @@ Script.Instance.prototype.run = function (message, threadId) {
         }
     });
 
-    console.log('running script %s', this.get("id"));
     var start = process.hrtime();
     var elapsed;
 
     try {
         vm.run(this.get("script"));
         elapsed = process.hrtime(start)[1] / 1000000;
-        console.log('done');
 
     } catch (e) {
         error = e;
@@ -199,8 +207,8 @@ Script.Instance.prototype.run = function (message, threadId) {
             Message
                 .build({ message: output, threadId: threadId, owner: 'script', scriptId: this.get("id") }) 
                 .save()
-                .then(() => { console.log('message added'); })
-                .catch((err) => { console.log(err); });
+                .then(() => { })
+                .catch((err) => {});
 
             this.update({ 
                 runs_left: this.runs_left - 1, 
@@ -208,12 +216,9 @@ Script.Instance.prototype.run = function (message, threadId) {
                 last_run_time: elapsed
             });
 
-            console.log("run_time", elapsed);
-            console.log("runs_left: %s", this.runs_left);
-            console.log(vm._context.output);
         }
         if (vm._context.star) {
-            message.update({ star: true });
+            message.addStar();
         }
 
         if (vm._context.dead) {

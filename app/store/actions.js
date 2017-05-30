@@ -1,6 +1,13 @@
 export default {
     
+    /*
+     *      Let op: actions moeten zo min mogelijk commits doen die eigenlijk vanuit de server
+     *      kunnen worden gestuurd; laat de server leidend zijn!
+     *     
+     */
+
     // @APPELMOES: Ajax spul naar api.js
+    
     fetchThreads ({ commit }) {
 
         $.ajax({ 
@@ -23,8 +30,7 @@ export default {
             type: "POST",
             data: JSON.stringify({ message: payload }),
             contentType: "application/json",
-            success: (message) => {
-            }
+            success: () => {}
         });
 
     },
@@ -41,10 +47,7 @@ export default {
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
-            success: (thread) => {
-                thread.messages = []; // @APPELMOES: is dit goed?
-                commit("CREATE_THREAD", thread);
-            }
+            success: () => {}
         });
     },
 
@@ -59,7 +62,6 @@ export default {
             url: "api/threads/" + payload,
             type: "DELETE",
             success: () => {
-                commit("DELETE_THREAD", payload); 
                 commit("SET_ACTIVE_THREAD_ID", null);
             }
         });
@@ -71,9 +73,7 @@ export default {
 
             url: "api/threads/" + state.activeThreadId + "/scripts/",
             type: "POST",
-            success (script) {
-                commit("CREATE_SCRIPT", script); 
-            }
+            success (script) {}
         });
     },
         
@@ -84,14 +84,8 @@ export default {
             type: "PUT",
             data: JSON.stringify(payload),
             contentType: "application/json",
-            success (script) {
-                commit("UPDATE_SCRIPT", script); 
-            }
+            success (script) {}
         });
-    },
-
-    receiveScript({ commit, state }, payload) {
-        commit("UPDATE_SCRIPT", payload);
     },
 
     /*

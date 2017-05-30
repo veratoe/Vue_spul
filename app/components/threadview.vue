@@ -2,7 +2,7 @@
 
     <div class="thread_view">
         <div class="header">
-            <span class="title">{{ thread.title }}</span> <span v-if="thread.dead">&#10014;</span><span class="delete_thread" @click="deleteThread">[X]</span>
+            <span class="title" :class="{ 'dead': thread.dead }">{{ thread.title }}</span> <span v-if="thread.dead" class="cross">&#10014;</span><span class="delete_thread" @click="deleteThread">[X]</span>
             <div class="tabs">
                 <span class="tab" @click="subView = 'messages'" :class="{ selected: subView == 'messages' }">Berichten</span>
                 <span class="tab" @click="subView = 'scripts'" :class="{ selected: subView == 'scripts' }">Scripts</span>
@@ -10,7 +10,7 @@
         </div>
     
         <div class="sub_view">
-            <MessagesView v-if="subView == 'messages'" :messages="thread.messages"></MessagesView>
+            <MessagesView v-if="subView == 'messages'" :messages="thread.messages" :thread="thread"></MessagesView>
             <ScriptsView v-if="subView == 'scripts'" :scripts="thread.scripts"></ScriptsView>
         </div>
     </div>
@@ -57,6 +57,15 @@
             .title {
                 font-size: 32px;
                 color: #888;
+
+                &.dead {
+                    text-decoration: line-through;
+                    color: #aaa;
+                }
+            }
+
+            .cross {
+                font-size: 40px;
             }
 
             .delete_thread {
