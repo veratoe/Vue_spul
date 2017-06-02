@@ -6,20 +6,53 @@ var User = module.exports = db.sequelize.define("user",
     {
         username: db.Sequelize.STRING,
         password: db.Sequelize.STRING,
-        salt: db.Sequelize.STRING
+        salt: db.Sequelize.STRING,
+        status: db.Sequelize.ENUM('active', 'timeout')
     },
     {
         hooks: {
+            afterCreate (instance, options) {
+                User
+                    .findById(instance.dataValues.id)
+                    .then(m => {
+                        Mutation.create({
+                            type: "CREATE_USER",
+                            values: m.dataValues                                         
+                        });
+                    });
+                
+
+            },
+            afterUpdate (instance, options) {
+                Mutation.create({
+                    type: "UPDATE_USER",
+                    values: instance.dataValues,                                         
+                    previousValues: instance._previousValues,
+                    changed: instance._changed
+                });
+
+            }
         }
     }
 );
 
 var router = require("../router.js");
 var Message = require("./message.js");
+var Mutation = require("./mutation.js");
+var Thread = require("./thread.js");
 var Vote = require("./vote.js");
 
 User.hasMany(Message);
 User.hasMany(Vote);
+User.hasMany(Thread);
+
+User.Instance.prototype.setTimeout = function (script, threadId) {
+    this
+        .update({ status: "timeout" })
+        .then(m => {
+            Message.create({ message: this.get("username") + " was timed-out by " + script.get("name"), threadId: threadId, owner: "system" }); 
+        });
+};
 
 router.post("/users", (req, res) => {
 
@@ -36,7 +69,7 @@ router.post("/users", (req, res) => {
 
 router.get("/users/login", (req, res) => {
 
-    var allowedFields = ['username', 'createdAt', 'updatedAt'];
+    var allowedFields = ['username', 'createdAt', 'updatedAt', 'status'];
     var response = {};
 
     if (req.authenticated) {

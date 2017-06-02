@@ -10,7 +10,10 @@ var Thread = module.exports = db.sequelize.define("thread",
         hooks: {
             afterCreate (instance, options) {
                 Thread
-                    .findById(instance.dataValues.id, { include: [Script] }) 
+                    .findById(instance.dataValues.id, { include: [
+                            { model: User, attributes: ['username'] },
+                            { model: Script, attributes: ['name' ] }
+                    ]})
                     .then(t => {
 
                         Mutation.create({
@@ -40,6 +43,7 @@ var User = require("./user");
 var Vote = require("./vote");
 
 Thread.hasMany(Message);
+Thread.belongsTo(User);
 
 
 Thread.Instance.prototype.kill = function () {
@@ -70,8 +74,13 @@ router.get("/threads", (req, res) => {
                     [db.sequelize.literal('(select count(*) from votes where "scriptId" = "scripts"."id" AND type = \'up\')'), 'upvotes'] 
                 ]
 
-            }],
-        }) 
+            },
+            {
+                model: User,
+                attributes: ['username']
+            },
+
+        ]}) 
         .then(threads => {
             res.json({ threads: threads });
         })
@@ -82,9 +91,15 @@ router.get("/threads", (req, res) => {
 
 router.post("/threads", (req, res) => {
 
+    if (!req.authenticated) {
+        res.status(400).send();
+        return;
+    }
+
     Thread
         .create({
-            title: req.body.title
+            title: req.body.title,
+            userId: req.user.id
         })
         .then(thread => {
             res.status(200).json(thread);

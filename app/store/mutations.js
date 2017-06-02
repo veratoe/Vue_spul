@@ -55,7 +55,6 @@ export default  {
     },
 
     UPDATE_SCRIPT (state, payload) {
-        console.log(payload);
         // @TODO: platslaan resources
         var thread = state.threads.find(t => t.id === payload.values.threadId);
         if (!thread) return;
@@ -78,10 +77,15 @@ export default  {
      *      login
      */
 
+    TIMEOUT (state, timeout) {
+        state.timeout = timeout;
+    },
+
     LOGIN (state, user) {
         state.logged_in = true;
         state.username = user.username;
         state.password = user.password;
+        state.timeout = user.status === "timeout";
         $.ajaxSetup({ headers: { 'Authorization': "Basic " + btoa(user.username + ":" + user.password) } });
     },
 

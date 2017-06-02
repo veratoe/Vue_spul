@@ -48,14 +48,14 @@ var Script = require("./script.js");
 Message.belongsTo(User);
 Message.belongsTo(Script);
 
-Message.Instance.prototype.addStar = function () {
+Message.Instance.prototype.addStar = function (script) {
 
     this.getUser().then(u => {
     
         this
             .update({ star: true })
             .then(m => {
-                Message.create({ message: u.get("username") + " got a star for that", threadId: this.get("threadId"), owner: "system" }); 
+                Message.create({ message: u.get("username") + " got a star for that from " + script.get("name"), threadId: this.get("threadId"), owner: "system" }); 
             });
     });
 };

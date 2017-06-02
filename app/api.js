@@ -39,6 +39,10 @@ setInterval(() => {
                     case "UPDATE_MESSAGE":
                         store.commit("UPDATE_MESSAGE", m);
                         break;
+
+                    case "UPDATE_USER":
+                        if (typeof m.changed.status !== "undefined") store.commit("TIMEOUT", m.values.status === "timeout");
+                        break;
                 }
 
             });

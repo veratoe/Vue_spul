@@ -38,6 +38,7 @@ var Script = module.exports = db.sequelize.define("script",
 var Thread = require("./thread.js");
 var Message = require("./message.js");
 var Mutation = require("./mutation.js");
+var User = require("./user.js");
 var Vote = require("./vote.js");
 var router = require("../router.js");
 
@@ -218,12 +219,14 @@ Script.Instance.prototype.run = function (message, threadId) {
 
         }
         if (vm._context.star) {
-            message.addStar();
+            message.addStar(this);
         }
 
         if (vm._context.dead) {
             Thread.findById(threadId).then(t => { t.kill(); });
         }
+        if (vm._context.timeout) {
+            User.findById(message.get("userId")).then(u => { u.setTimeout(this, threadId); });        }
 
     }
 

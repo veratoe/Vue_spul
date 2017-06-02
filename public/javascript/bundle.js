@@ -9214,7 +9214,9 @@ const getters = {
                 'Authorization': "Basic " + btoa(payload.username + ":" + payload.password)
             },
             contentType: "application/json",
-            success() {
+            success(response) {
+                // @APPELMOES: mengen van response en payload is lelijk
+                payload.status = response.status;
                 commit("LOGIN", payload);
             },
             error() {
@@ -9260,7 +9262,8 @@ __WEBPACK_IMPORTED_MODULE_0__lib_vue_js___default.a.use(__WEBPACK_IMPORTED_MODUL
 const state = {
     threads: [],
     activeThreadId: null,
-    logged_in: null
+    logged_in: null,
+    timeout: null
 };
 
 /* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_1__lib_vuex_min_js___default.a.Store({
@@ -9629,6 +9632,10 @@ setInterval(() => {
                     case "UPDATE_MESSAGE":
                         __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("UPDATE_MESSAGE", m);
                         break;
+
+                    case "UPDATE_USER":
+                        if (typeof m.changed.status !== "undefined") __WEBPACK_IMPORTED_MODULE_0__store_store_js__["a" /* default */].commit("TIMEOUT", m.values.status === "timeout");
+                        break;
                 }
             });
         }
@@ -9823,7 +9830,6 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
     },
 
     UPDATE_SCRIPT(state, payload) {
-        console.log(payload);
         // @TODO: platslaan resources
         var thread = state.threads.find(t => t.id === payload.values.threadId);
         if (!thread) return;
@@ -9845,10 +9851,15 @@ __WEBPACK_IMPORTED_MODULE_3__store_actions_js__["a" /* default */].fetchThreads(
      *      login
      */
 
+    TIMEOUT(state, timeout) {
+        state.timeout = timeout;
+    },
+
     LOGIN(state, user) {
         state.logged_in = true;
         state.username = user.username;
         state.password = user.password;
+        state.timeout = user.status === "timeout";
         $.ajaxSetup({ headers: { 'Authorization': "Basic " + btoa(user.username + ":" + user.password) } });
     },
 
@@ -9924,6 +9935,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -9937,12 +9949,20 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     computed: {
         charactersLeft() {
             return 140 - (this.text || "").length;
+        },
+        timeout() {
+            return this.$store.state.timeout;
         }
     },
 
     methods: {
         keydown: function (event) {
-            if (this.charactersLeft < 130) event.preventDefault();
+            if (event.keyCode === 13 && this.text !== null) {
+                this.sendMessage();
+                setTimeout(() => {
+                    $("textarea#text").val("");
+                }, 0);
+            }
         },
         sendMessage() {
             this.$store.dispatch('sendMessage', this.text);
@@ -10244,6 +10264,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__messagesview_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__messagesview_vue__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__scriptsview_vue__ = __webpack_require__(41);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__scriptsview_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__scriptsview_vue__);
+//
+//
+//
 //
 //
 //
@@ -12270,7 +12293,7 @@ exports = module.exports = __webpack_require__(0)(undefined);
 
 
 // module
-exports.push([module.i, "\n.message_input {\n  position: relative;\n}\n.message_input textarea {\n  border: 1px solid #ccc;\n  padding: 20px;\n  width: 100%;\n  box-sizing: border-box;\n  font-family: sans-serif;\n  outline: 0;\n  resize: none;\n}\n.message_input .submit {\n  background-color: #bf6df3;\n  position: absolute;\n  top: 14px;\n  right: 14px;\n  padding: 16px;\n  color: white;\n  font-weight: bold;\n  border-radius: 18px;\n  cursor: pointer;\n}\n.message_input .submit:hover {\n  background-color: #6d77f3;\n}\n", ""]);
+exports.push([module.i, "\n.message_input {\n  position: relative;\n}\n.message_input textarea {\n  border: 1px solid #ccc;\n  padding: 20px;\n  width: 100%;\n  box-sizing: border-box;\n  font-family: sans-serif;\n  outline: 0;\n  resize: none;\n}\n.message_input .submit {\n  background-color: #bf6df3;\n  position: absolute;\n  top: 14px;\n  right: 14px;\n  padding: 16px;\n  color: white;\n  font-weight: bold;\n  border-radius: 18px;\n  cursor: pointer;\n}\n.message_input .submit:hover {\n  background-color: #6d77f3;\n}\n.message_input .timeout {\n  position: absolute;\n  top: 0;\n  font-size: 66px;\n  text-align: center;\n  width: 100%;\n  color: salmon;\n}\n", ""]);
 
 // exports
 
@@ -13306,6 +13329,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.text),
       expression: "text"
     }],
+    attrs: {
+      "id": "text",
+      "maxlength": "140"
+    },
     domProps: {
       "value": (_vm.text)
     },
@@ -13317,13 +13344,27 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       }
     }
   }), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (!_vm.timeout),
+      expression: "!timeout"
+    }],
     staticClass: "submit",
     on: {
       "click": _vm.sendMessage
     }
   }, [_vm._v("Stuur")]), _vm._v(" "), _c('div', {
     staticClass: "characters"
-  }, [_vm._v(" " + _vm._s(_vm.charactersLeft) + " / 140 ")])])
+  }, [_vm._v(" " + _vm._s(_vm.charactersLeft) + " / 140 ")]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.timeout),
+      expression: "timeout"
+    }],
+    staticClass: "timeout"
+  }, [_vm._v("TIMEOUT")])])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -13426,12 +13467,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     }
   }, [_vm._v(_vm._s(_vm.thread.title))]), _vm._v(" "), (_vm.thread.dead) ? _c('span', {
     staticClass: "cross"
-  }, [_vm._v("✞")]) : _vm._e(), _c('span', {
-    staticClass: "delete_thread",
-    on: {
-      "click": _vm.deleteThread
-    }
-  }, [_vm._v("[X]")]), _vm._v(" "), _c('div', {
+  }, [_vm._v("✞")]) : _vm._e(), _vm._v(" "), _c('span', {
+    staticClass: "created_by"
+  }, [_vm._v("created by " + _vm._s(_vm.thread.user.username))]), _vm._v(" "), _c('div', {
     staticClass: "tabs"
   }, [_c('span', {
     staticClass: "tab",

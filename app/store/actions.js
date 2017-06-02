@@ -171,7 +171,9 @@ export default {
                 'Authorization': "Basic " + btoa(payload.username + ":" + payload.password)
             },
             contentType: "application/json",
-            success () {
+            success (response) {
+                // @APPELMOES: mengen van response en payload is lelijk
+                payload.status = response.status
                 commit("LOGIN", payload);
             },
             error() {

@@ -1,9 +1,10 @@
 <template>
 
     <div class="message_input">
-        <textarea v-model="text" @keydown="keydown"></textarea>
-        <div class="submit" @click="sendMessage">Stuur</div>
+        <textarea id="text" v-model="text" @keydown="keydown" maxlength="140"></textarea>
+        <div v-show="!timeout" class="submit" @click="sendMessage">Stuur</div>
         <div class="characters"> {{ charactersLeft }} / 140 </div>
+        <div v-show="timeout" class="timeout">TIMEOUT</div>
     </div>
 
 </template>
@@ -21,12 +22,18 @@
         computed: {
             charactersLeft () {
                 return 140 - (this.text || "").length;
+            },
+            timeout () {
+                return this.$store.state.timeout;
             }
         },
 
         methods: {
             keydown: function (event) {
-                if (this.charactersLeft < 130) event.preventDefault();
+                if (event.keyCode === 13 && this.text !== null) {
+                    this.sendMessage();
+                    setTimeout(() => {$("textarea#text").val("");},0);
+                }
             },
             sendMessage () {
                 this.$store.dispatch('sendMessage', this.text); 
@@ -68,6 +75,15 @@
             &:hover {
                 background-color: #6d77f3;
             }
+        }
+
+        .timeout {
+            position: absolute;
+            top: 0;
+            font-size: 66px;
+            text-align: center;
+            width: 100%;
+            color: salmon;
         }
 
         .characters {
