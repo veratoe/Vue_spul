@@ -1,3 +1,5 @@
+const apiRoot = "http://dikmachine:8000/api/";
+
 export default {
     
     /*
@@ -11,12 +13,15 @@ export default {
     fetchThreads ({ commit }) {
 
         $.ajax({ 
-            url: "api/threads", 
+            url: apiRoot + "threads", 
             type: "GET", 
             success: function (data, textStatus, jqXHR) {
-                commit("RECEIVE_THREADS", data.threads);
-            }
+                console.log(data);
+                commit("RECEIVE_THREADS", data);
+            },
+            error: () => {}
         });
+
     },
 
     setActiveThreadId ({ commit }, payload) {
@@ -26,7 +31,7 @@ export default {
     sendMessage ({ commit, state }, payload) {
 
         $.ajax({
-            url: "api/threads/" + state.activeThreadId + "/messages",
+            url: apiRoot + "threads/" + state.activeThreadId + "/messages",
             type: "POST",
             data: JSON.stringify({ message: payload }),
             contentType: "application/json",
@@ -43,7 +48,7 @@ export default {
     createThread ({ commit, state }, payload) {
 
         $.ajax({
-            url: "api/threads/",
+            url: apiRoot + "threads/",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
@@ -59,7 +64,7 @@ export default {
     deleteThread ({ commit, state } , payload) {
         
         $.ajax({
-            url: "api/threads/" + payload,
+            url: apiRoot + "threads/" + payload,
             type: "DELETE",
             success: () => {
                 commit("SET_ACTIVE_THREAD_ID", null);
@@ -71,7 +76,7 @@ export default {
         
         $.ajax({
 
-            url: "api/threads/" + state.activeThreadId + "/scripts/",
+            url: apiRoot + "threads/" + state.activeThreadId + "/scripts/",
             type: "POST",
             success (script) {}
         });
@@ -80,7 +85,7 @@ export default {
     saveScript({ commit, state }, payload) {
 
         $.ajax({
-            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload.id,
+            url: apiRoot + "threads/" + state.activeThreadId + "/scripts/" + payload.id,
             type: "PUT",
             data: JSON.stringify(payload),
             contentType: "application/json",
@@ -96,7 +101,7 @@ export default {
     upvoteScript({ commit, state }, payload) {
 
         $.ajax({
-            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload + "/upvote",
+            url: apiRoot + "threads/" + state.activeThreadId + "/scripts/" + payload + "/upvote",
             type: "GET",
             contentType: "application/json",
             success (script) {}
@@ -111,7 +116,7 @@ export default {
     downvoteScript({ commit, state }, payload) {
 
         $.ajax({
-            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload + "/downvote",
+            url: apiRoot + "threads/" + state.activeThreadId + "/scripts/" + payload + "/downvote",
             type: "GET",
             contentType: "application/json",
             success (script) {}
@@ -126,7 +131,7 @@ export default {
     deleteScript({ commit, state }, payload) {
 
         $.ajax({
-            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload,
+            url: apiRoot + "threads/" + state.activeThreadId + "/scripts/" + payload,
             type: "DELETE",
             contentType: "application/json",
             success () {
@@ -138,7 +143,7 @@ export default {
     activateScript({ commit, state }, payload) {
 
         $.ajax({
-            url: "api/threads/" + state.activeThreadId + "/scripts/" + payload,
+            url: apiRoot + "threads/" + state.activeThreadId + "/scripts/" + payload,
             type: "PUT",
             data: JSON.stringify({ active: true }),
             contentType: "application/json",
@@ -154,7 +159,7 @@ export default {
     createUser({ commit, state }, payload) {
         console.log('creatan with', payload);
         $.ajax({
-            url: "api/users",
+            url: apiRoot + "users",
             type: "POST",
             data: JSON.stringify(payload),
             contentType: "application/json",
@@ -165,7 +170,7 @@ export default {
     login({ commit, state }, payload) {
 
         $.ajax({
-            url: "api/users/login",
+            url: apiRoot + "users/login",
             // @APPELMOES: 1 keer met de hand meegeven ?
             headers: {
                 'Authorization': "Basic " + btoa(payload.username + ":" + payload.password)
