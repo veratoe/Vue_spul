@@ -3,14 +3,14 @@
         <div class="messages">
             <div class="message_view" v-for="message in messages" :key=message.id :class="{ 'star': message.star }">
                 <span class="star" v-if="message.star">*</span>
-                <div v-if="message.owner == 'user'" class="owner user">{{ message.user && message.user.username }}</div>
-                <div v-if="message.owner == 'script'" class="owner script">{{ message.script && message.script.name }}</div>
-                <div v-if="message.owner == 'system'" class="owner system"></div>
+                <div v-if="message.type == 'user'" class="owner user">{{ message.user && message.user.name }}</div>
+                <div v-if="message.type == 'script'" class="owner script">{{ message.script && message.script.name }}</div>
+                <div v-if="message.type == 'system'" class="owner system"></div>
                 <div class="body">
-                    <span class="message" :class="{ 'system': message.owner == 'system' }">{{ message.message }}</span>
+                    <span class="message" :class="{ 'system': message.type == 'system' }">{{ message.content }}</span>
                     <span class="id">{{ message.id }}</span>
-                    <span class="timestamp">{{ (now - (new Date(message.createdAt)).getTime()) / 1000 | time_ago  }} </span>
-                    <span class="controls" v-if="message.owner == 'script'">
+                    <span class="timestamp">{{ message.created_at | format_time | time_ago }} </span>
+                    <span class="controls" v-if="message.type == 'script'">
                         <span class="upvote" @click="upvote(message.scriptId)">[^]</span> 
                         <span class="downvote" @click="downvote(message.scriptId)">[v]</span> 
                     </span>
@@ -30,15 +30,15 @@
         components: { MessageInput },
         props: { thread: Object, messages: Array },
         data () {
-            return {
-                now: Date.now()
-            }
+            return {}
         },
+
         computed: {
             logged_in () {
                 return this.$store.state.logged_in;
             }
         },
+
         methods: {
             scrollToBottom () {
                 var $messages = $(".messages");
@@ -52,6 +52,7 @@
                 this.$store.dispatch("downvoteScript", scriptId);
             }
         },
+
         created () {
             this.int = setInterval(() => { this.$data.now = Date.now(); }, 10000);
             this.$store.subscribe((mutation, state) => {
@@ -62,10 +63,18 @@
             setTimeout(() => {
                 $(".messages").scrollTop($(".messages")[0].scrollHeight);
             });
-            
+
         },
+
         destroyed () {
             clearInterval(this.int);
+        },
+
+        filters: {
+            format_time: function(value) {
+                return (new Date().getTime() -  (new Date(value)).getTime()) / 1000;
+            }
+
         }
     }
 
@@ -125,7 +134,6 @@
                     flex: 1 1 0;
                     padding: 8px;
                     background-color: #efefef;
-     
 
                     .message {
                         width: 60%;
@@ -149,7 +157,7 @@
                         width: 12%;
                         margin-left: 26px;
                         text-align: right;
-                        
+
                         * {
                             cursor: pointer;
                         }
@@ -159,8 +167,8 @@
                 &.star {
                     .body, .user, .script {
                         background: #888 !important;
-                    }                 
-    
+                    }
+
                     .message {
                         color: yellow;
                         font-weight: bold;

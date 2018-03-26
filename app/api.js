@@ -3,6 +3,7 @@ import store from "./store/store.js";
 // we gaan ervan uit dat geen enkele mutatie bekend is bij de client
 var mutationHandle = 0;
 
+/*
 setInterval(() => {
     
     $.ajax({  
@@ -50,4 +51,6 @@ setInterval(() => {
 
     });
 
+
 }, 500);
+*/

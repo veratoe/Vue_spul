@@ -10,13 +10,26 @@ export default  {
     RECEIVE_THREADS (state, threads) {
         state.threads = threads;
     },
+
+    RECEIVE_THREAD_MESSAGES (state, payload) {
+        var thread = state.threads.find(t => t.id === payload.threadId);
+        Vue.set(thread, 'messages', payload.messages);
+    },
+
+    RECEIVE_THREAD_SCRIPTS (state, payload) {
+        var thread = state.threads.find(t => t.id === payload.threadId);
+        Vue.set(thread, 'scripts', payload.scripts);
+    },
+
     CREATE_THREAD (state, payload) {
         state.threads.push(payload.values);
     },
+
     DELETE_THREAD (state, threadId) {
         var index = state.threads.findIndex(t => t.id === threadId);
         state.threads.splice(index, 1);
     },
+
     UPDATE_THREAD (state, payload) {
         var thread = state.threads.find(t => t.id === payload.values.id);
         for (var property in payload.changed) {
@@ -27,6 +40,7 @@ export default  {
     SET_ACTIVE_THREAD_ID (state, threadId) {
         state.activeThreadId = threadId; 
     },
+
 
     /*
      *      message

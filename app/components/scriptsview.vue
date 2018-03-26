@@ -15,14 +15,14 @@
         name: 'ScriptsView',
         components: { ScriptView },
         props: {
-            scripts: Array          
+            scripts: Array
         },
         methods: {
             createScript () {
                 this.$store.dispatch('createScript');
             }
         }
-    }   
+    }
 
 </script>
 

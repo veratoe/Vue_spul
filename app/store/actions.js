@@ -9,19 +9,38 @@ export default {
      */
 
     // @APPELMOES: Ajax spul naar api.js
-    
+
     fetchThreads ({ commit }) {
 
         $.ajax({ 
             url: apiRoot + "threads", 
             type: "GET", 
             success: function (data, textStatus, jqXHR) {
-                console.log(data);
                 commit("RECEIVE_THREADS", data);
             },
             error: () => {}
         });
 
+    },
+
+    fetchMessages ({ commit }, payload) {
+        $.ajax({
+            url: apiRoot + "threads/" + payload + "/comments",
+            success (data, textStatus, jqXHR) {
+                console.log(data);
+                commit("RECEIVE_THREAD_MESSAGES", { threadId: payload, messages: data });
+            }
+        });
+    },
+
+    fetchScripts ({ commit }, payload) {
+        $.ajax({
+            url: apiRoot + "threads/" + payload + "/scripts",
+            success (data, textStatus, jqXHR) {
+                console.log(data);
+                commit("RECEIVE_THREAD_SCRIPTS", { threadId: payload, scripts: data });
+            }
+        });
     },
 
     setActiveThreadId ({ commit }, payload) {
@@ -62,7 +81,7 @@ export default {
      */    
 
     deleteThread ({ commit, state } , payload) {
-        
+
         $.ajax({
             url: apiRoot + "threads/" + payload,
             type: "DELETE",
@@ -73,15 +92,14 @@ export default {
     },
 
     createScript({ commit, state }) {
-        
-        $.ajax({
 
+        $.ajax({
             url: apiRoot + "threads/" + state.activeThreadId + "/scripts/",
             type: "POST",
             success (script) {}
         });
     },
-        
+
     saveScript({ commit, state }, payload) {
 
         $.ajax({
@@ -157,7 +175,6 @@ export default {
      */
 
     createUser({ commit, state }, payload) {
-        console.log('creatan with', payload);
         $.ajax({
             url: apiRoot + "users",
             type: "POST",

@@ -2,16 +2,17 @@
 
     <div class="thread_view">
         <div class="header">
+            <img :src="thread.image_url" width=80 height=80>
             <span class="title" :class="{ 'dead': thread.dead }">{{ thread.title }}</span> 
             <span v-if="thread.dead" class="cross">&#10014;</span>
             <!--<span class="delete_thread" @click="deleteThread">[X]</span>-->
-            <span class="created_by">created by {{ thread.user.username }}</span>
+            <span class="created_by">created by {{ thread.author }}</span>
             <div class="tabs">
                 <span class="tab" @click="subView = 'messages'" :class="{ selected: subView == 'messages' }">Berichten</span>
                 <span class="tab" @click="subView = 'scripts'" :class="{ selected: subView == 'scripts' }">Scripts</span>
             </div>
         </div>
-    
+
         <div class="sub_view">
             <MessagesView v-if="subView == 'messages'" :messages="thread.messages" :thread="thread"></MessagesView>
             <ScriptsView v-if="subView == 'scripts'" :scripts="thread.scripts"></ScriptsView>
@@ -34,12 +35,23 @@
         data: () => { return {
             subView: "messages"
         }},
+
+        watch: {
+            thread () {
+                this.$store.dispatch('fetchMessages', this.thread.id);
+                this.$store.dispatch('fetchScripts', this.thread.id);
+            }
+
+        },
+
         methods: {
             deleteThread () {
                 this.$store.dispatch('deleteThread', this.thread.id);
             }
         },
-        created () {
+        mounted () {
+            this.$store.dispatch('fetchMessages', this.thread.id);
+                this.$store.dispatch('fetchScripts', this.thread.id);
         }
     }
 

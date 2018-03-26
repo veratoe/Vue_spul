@@ -1,5 +1,6 @@
 module.exports = {
     entry: "./app/app.js",
+    mode: 'development',
 
     module: {
         rules: [
