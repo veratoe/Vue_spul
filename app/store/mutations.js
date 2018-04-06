@@ -46,9 +46,9 @@ export default  {
      *      message
      */
 
-    CREATE_MESSAGE (state, payload) {
-        var thread = state.threads.find(t => t.id === payload.values.threadId);
-        thread.messages.push(payload.values);
+    CREATE_COMMENT (state, payload) {
+        var thread = state.threads.find(t => t.id === Number(payload.thread_id));
+        thread.messages.push(payload);
     },
 
     UPDATE_MESSAGE (state, payload) {

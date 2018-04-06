@@ -35,7 +35,8 @@
 
         computed: {
             logged_in () {
-                return this.$store.state.logged_in;
+                //return this.$store.state.logged_in;
+                return true;
             }
         },
 
@@ -56,7 +57,7 @@
         created () {
             this.int = setInterval(() => { this.$data.now = Date.now(); }, 10000);
             this.$store.subscribe((mutation, state) => {
-                if (mutation.type === "CREATE_MESSAGE" || mutation.type === "LOGIN") {
+                if (mutation.type === "CREATE_COMMENT" || mutation.type === "LOGIN") {
                     this.scrollToBottom();
                 }
             });

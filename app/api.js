@@ -1,56 +1,43 @@
 import store from "./store/store.js";
 
 // we gaan ervan uit dat geen enkele mutatie bekend is bij de client
-var mutationHandle = 0;
+var webSocket = new WebSocket("ws://192.168.1.21:8090");
 
-/*
-setInterval(() => {
-    
-    $.ajax({  
+webSocket.onopen = (evt) => { console.log("connected"); console.log(evt) };
+webSocket.onmessage = (evt) => { 
 
-        url: "api/mutations/" + mutationHandle,
-        type: "GET",
-        contentType: "application/json",
-        success: (ms) => {
-            ms.forEach((m) => {
-                mutationHandle = m.id;
+    console.log("Message received");
+    console.log(evt);
 
-                console.log(m);
+    var data = JSON.parse(evt.data);
 
-                switch(m.type) {
-                    case "CREATE_THREAD":
-                        store.commit("CREATE_THREAD", m);
-                        break;
-                    case "UPDATE_THREAD":
-                        store.commit("UPDATE_THREAD", m);
-                        break;
+    switch(data.type) {
+        case "CREATE_THREAD":
+            store.commit("CREATE_THREAD", data.payload);
+            break;
+        case "UPDATE_THREAD":
+            store.commit("UPDATE_THREAD", data.payload);
+            break;
 
-                    case "CREATE_SCRIPT": 
-                        store.commit("CREATE_SCRIPT", m);
-                        break;
+        case "CREATE_SCRIPT": 
+            store.commit("CREATE_SCRIPT", data.payload);
+            break;
 
-                    case "UPDATE_SCRIPT": 
-                        store.commit("UPDATE_SCRIPT", m);
-                        break;
+        case "UPDATE_SCRIPT": 
+            store.commit("UPDATE_SCRIPT", data.payload);
+            break;
 
-                    case "CREATE_MESSAGE": 
-                        store.commit("CREATE_MESSAGE", m);
-                        break;
+        case "CREATE_COMMENT": 
+            store.commit("CREATE_COMMENT", data.payload);
+            break;
 
-                    case "UPDATE_MESSAGE":
-                        store.commit("UPDATE_MESSAGE", m);
-                        break;
+        case "UPDATE_MESSAGE":
+            store.commit("UPDATE_MESSAGE", data.payload);
+            break;
 
-                    case "UPDATE_USER":
-                        if (typeof m.changed.status !== "undefined") store.commit("TIMEOUT", m.values.status === "timeout");
-                        break;
-                }
+        case "UPDATE_USER":
+            if (typeof m.changed.status !== "undefined") store.commit("TIMEOUT", m.values.status === "timeout");
+            break;
+    }
 
-            });
-        }
-
-    });
-
-
-}, 500);
-*/
+}

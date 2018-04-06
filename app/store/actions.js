@@ -50,9 +50,9 @@ export default {
     sendMessage ({ commit, state }, payload) {
 
         $.ajax({
-            url: apiRoot + "threads/" + state.activeThreadId + "/messages",
+            url: apiRoot + "threads/" + state.activeThreadId + "/comments",
             type: "POST",
-            data: JSON.stringify({ message: payload }),
+            data: JSON.stringify({ content: payload }),
             contentType: "application/json",
             success: () => {}
         });
