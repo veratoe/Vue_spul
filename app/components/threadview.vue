@@ -3,42 +3,42 @@
     <div class="thread_view">
         <div class="header">
             <img :src="thread.image_url" width=80 height=80>
-            <span class="title" :class="{ 'dead': thread.dead }">{{ thread.title }}</span> 
-            <span v-if="thread.dead" class="cross">&#10014;</span>
-            <!--<span class="delete_thread" @click="deleteThread">[X]</span>-->
-            <span class="created_by">created by {{ thread.author }}</span>
+            <div style="flex-grow: 1" class="thread_details">
+                <span class="title" :class="{ 'dead': thread.dead }">{{ thread.title }}</span> 
+                <span v-if="thread.dead" class="cross">&#10014;</span><br/>
+                <span class="author_label">created by</span> <span class="author">{{ thread.author }}</span>
+            </div>
             <div class="tabs">
-                <span class="tab" @click="subView = 'messages'" :class="{ selected: subView == 'messages' }">Berichten</span>
+                <span class="tab" @click="subView = 'comments'" :class="{ selected: subView == 'comments' }">Berichten</span>
                 <span class="tab" @click="subView = 'scripts'" :class="{ selected: subView == 'scripts' }">Scripts</span>
             </div>
         </div>
 
         <div class="sub_view">
-            <MessagesView v-if="subView == 'messages'" :messages="thread.messages" :thread="thread"></MessagesView>
+            <commentsView v-if="subView == 'comments'" :comments="thread.comments" :thread="thread"></commentsView>
             <ScriptsView v-if="subView == 'scripts'" :scripts="thread.scripts"></ScriptsView>
-        </div>
-    </div>
+        </div> </div>
 
 </template>
 
 <script>
 
-    import MessagesView from "./messagesview.vue";
+    import CommentsView from "./commentsview.vue";
     import ScriptsView from "./scriptsview.vue";
 
     export default {
         name: 'ThreadView',
-        components: { MessagesView, ScriptsView },
+        components: { CommentsView, ScriptsView },
         props: {
             thread: Object
         },
         data: () => { return {
-            subView: "messages"
+            subView: "comments"
         }},
 
         watch: {
             thread () {
-                this.$store.dispatch('fetchMessages', this.thread.id);
+                this.$store.dispatch('fetchcomments', this.thread.id);
                 this.$store.dispatch('fetchScripts', this.thread.id);
             }
 
@@ -50,7 +50,7 @@
             }
         },
         mounted () {
-            this.$store.dispatch('fetchMessages', this.thread.id);
+            this.$store.dispatch('fetchcomments', this.thread.id);
                 this.$store.dispatch('fetchScripts', this.thread.id);
         }
     }
@@ -65,19 +65,33 @@
         padding: 20px;
         display: flex;
         flex-direction: column;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        margin: 5px;
+        padding: 20px;
 
         .header {
-            flex: 0 0 50px;
+            display: flex;
+            min-height: 90px;
 
-            .title {
-                font-size: 32px;
-                color: #888;
+            .thread_details {
+                padding: 16px;
 
-                &.dead {
-                    text-decoration: line-through;
-                    color: #aaa;
+                .title {
+                    font-size: 28px;
+                    color: #9c7da5;
+
+
+                    &.dead {
+                        text-decoration: line-through;
+                        color: #aaa;
+                    }
                 }
+
+                .author { font-weight: bold; color: #888; }
+                .author_label { color: #aaa; }
+
             }
+
 
             .cross {
                 font-size: 40px;
@@ -99,7 +113,7 @@
                     &.selected { text-decoration: underline }
                 }
             }
-            
+
         }
 
         .sub_view {
@@ -107,5 +121,5 @@
         }
 
     }
-    
+
 </style>

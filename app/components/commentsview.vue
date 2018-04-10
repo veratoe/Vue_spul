@@ -1,34 +1,34 @@
 <template>
-    <div class="messages_view">
-        <div class="messages">
-            <div class="message_view" v-for="message in messages" :key=message.id :class="{ 'star': message.star }">
-                <span class="star" v-if="message.star">*</span>
-                <div v-if="message.type == 'user'" class="owner user">{{ message.user && message.user.name }}</div>
-                <div v-if="message.type == 'script'" class="owner script">{{ message.script && message.script.name }}</div>
-                <div v-if="message.type == 'system'" class="owner system"></div>
+    <div class="comments_view">
+        <div class="comments">
+            <div class="comment_view" v-for="comment in comments" :key=comment.id :class="{ 'star': comment.star }">
+                <span class="star" v-if="comment.star">*</span>
+                <div v-if="comment.type == 'user'" class="owner user">{{ comment.user && comment.user.name }}</div>
+                <div v-if="comment.type == 'script'" class="owner script">{{ comment.script && comment.script.name }}</div>
+                <div v-if="comment.type == 'system'" class="owner system"></div>
                 <div class="body">
-                    <span class="message" :class="{ 'system': message.type == 'system' }">{{ message.content }}</span>
-                    <span class="id">{{ message.id }}</span>
-                    <span class="timestamp">{{ message.created_at | format_time | time_ago }} </span>
-                    <span class="controls" v-if="message.type == 'script'">
-                        <span class="upvote" @click="upvote(message.scriptId)">[^]</span> 
-                        <span class="downvote" @click="downvote(message.scriptId)">[v]</span> 
+                    <span class="comment" :class="{ 'system': comment.type == 'system' }">{{ comment.content }}</span>
+                    <span class="id">{{ comment.id }}</span>
+                    <span class="timestamp">{{ comment.created_at | format_time | time_ago }} </span>
+                    <span class="controls" v-if="comment.type == 'script'">
+                        <span class="upvote" @click="upvote(comment.scriptId)">[^]</span> 
+                        <span class="downvote" @click="downvote(comment.scriptId)">[v]</span> 
                     </span>
                 </div>
             </div>
         </div>
-        <MessageInput v-if="logged_in && !thread.dead"></MessageInput>
+        <commentInput v-if="logged_in && !thread.dead"></commentInput>
     </div>
 </template>
 
 <script>
 
-    import MessageInput from "./messageinput.vue";
+    import commentInput from "./commentinput.vue";
 
     export default {
-        name: "MessagesView",
-        components: { MessageInput },
-        props: { thread: Object, messages: Array },
+        name: "commentsView",
+        components: { commentInput },
+        props: { thread: Object, comments: Array },
         data () {
             return {}
         },
@@ -42,9 +42,9 @@
 
         methods: {
             scrollToBottom () {
-                var $messages = $(".messages");
-                if ($messages.length)
-                $messages.animate({ scrollTop: $messages[0].scrollHeight });
+                var $comments = $(".comments");
+                if ($comments.length)
+                $comments.animate({ scrollTop: $comments[0].scrollHeight });
             },
             upvote (scriptId) {
                 this.$store.dispatch("upvoteScript", scriptId);
@@ -62,7 +62,7 @@
                 }
             });
             setTimeout(() => {
-                $(".messages").scrollTop($(".messages")[0].scrollHeight);
+                $(".comments").scrollTop($(".comments")[0].scrollHeight);
             });
 
         },
@@ -83,17 +83,17 @@
 
 <style lang="less">
 
-    .messages_view {
+    .comments_view {
         display: flex;
         flex-direction: column;
         height: 100%;
 
-        .messages {
+        .comments {
             flex: 1 1 0;
             margin-bottom: 10px;
             overflow-y: scroll;
    
-            .message_view {
+            .comment_view {
                 flex-direction: row;
                 display: flex;
                 position: relative;
@@ -136,7 +136,7 @@
                     padding: 8px;
                     background-color: #efefef;
 
-                    .message {
+                    .comment {
                         width: 60%;
 
                         &.system {
@@ -170,7 +170,7 @@
                         background: #888 !important;
                     }
 
-                    .message {
+                    .comment {
                         color: yellow;
                         font-weight: bold;
                     }
@@ -178,7 +178,7 @@
             }
         }
 
-        .message_input {
+        .comment_input {
             flex: 0 1 10vh;
             height: 150px;
         }

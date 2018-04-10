@@ -24,14 +24,14 @@
         computed: {
             threads() {
                 return this.$store.state.threads;
-            },   
+            },
             activeThreadId () {
                 return this.$store.state.activeThreadId
             }
         },
 
         methods: {
-        
+
             setActiveThreadId (id) {
                 this.$store.dispatch('setActiveThreadId', id);
             },
@@ -50,10 +50,11 @@
 
 .thread_list {
 
-    background-color: #f0f0f0;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    margin: 5px;
     width: 25%;
     height: 100%;
-    border-right: 2px solid #ccc;
+    padding: 10px;
 
     .thread_list_item {
         padding: 4px;

@@ -1,8 +1,8 @@
 <template>
 
-    <div class="message_input">
+    <div class="comment_input">
         <textarea id="text" v-model="text" @keydown="keydown" maxlength="140"></textarea>
-        <div v-show="!timeout" class="submit" @click="sendMessage">Stuur</div>
+        <div v-show="!timeout" class="submit" @click="sendcomment">Stuur</div>
         <div class="characters"> {{ charactersLeft }} / 140 </div>
         <div v-show="timeout" class="timeout">TIMEOUT</div>
     </div>
@@ -12,7 +12,7 @@
 <script>
 
     export default {
-        name: "MessageInput",
+        name: "commentInput",
         data: () => { 
             return {
                 text: null,
@@ -31,12 +31,12 @@
         methods: {
             keydown: function (event) {
                 if (event.keyCode === 13 && this.text !== null) {
-                    this.sendMessage();
+                    this.sendcomment();
                     setTimeout(() => {$("textarea#text").val("");},0);
                 }
             },
-            sendMessage () {
-                this.$store.dispatch('sendMessage', this.text); 
+            sendcomment () {
+                this.$store.dispatch('sendcomment', this.text); 
                 this.text = null
             }
         },
@@ -48,7 +48,7 @@
 
 <style lang="less">
 
-    .message_input {
+    .comment_input {
         position: relative;
 
         textarea {
@@ -62,15 +62,15 @@
         }
 
         .submit {
-            background-color: #bf6df3;
+            background-color: #b3a6d6;
             position: absolute;
             top: 14px;
             right: 14px;
-            padding: 16px;
             color: white;
             font-weight: bold;
-            border-radius: 18px;
+            border-radius: 4px;
             cursor: pointer;
+            padding: 9px;
 
             &:hover {
                 background-color: #6d77f3;

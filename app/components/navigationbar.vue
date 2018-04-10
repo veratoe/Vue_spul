@@ -1,7 +1,7 @@
 <template>
         <div class="navigation_bar">
 
-            <span class="title">OOLEWAPPER</span>
+            <span class="title">WubbyChat</span>
             <div v-if="logged_in">
                 Welkom, <strong>{{ username }}</strong>
                 <button style="float: right" @click="logout">Logout</button>
@@ -50,6 +50,9 @@
 
 
     .navigation_bar {
+        box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+        margin: 5px;
+        padding: 10px;
 
         .title {
             float: left;
@@ -57,18 +60,18 @@
             color: #d44c4c;
             font-weight: bold;
             font-size: 18px;
+            font-style: italic;
+            text-decoration: underline;
         }
 
         input {
             padding: 4px;
             border: 0;
             outline: 0;
-
         }
 
-        background-color: #222;
-        padding: 10px;
     }
+
 </style>
 
 

@@ -4,7 +4,7 @@
         <div class="main_view">
             <ThreadList></ThreadList>
             <ThreadView v-if="activeThreadId" :thread="getActiveThread"></ThreadView>
-        </div>    
+        </div>
     </div>
 </template>
 

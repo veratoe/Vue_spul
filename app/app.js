@@ -19,4 +19,4 @@ new Vue ({
     render: h => h(app)
 });
 
-actions.fetchThreads(store);   
+actions.fetchThreads(store);
