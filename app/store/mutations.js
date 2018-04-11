@@ -4,6 +4,14 @@ import Vue from     "../lib/vue.js";
 export default  {
 
     /*
+     *      web socket
+     */
+
+    UPDATE_CONNECTION(state, payload) {
+        state.connection = payload;
+    },
+
+    /*
      *      thread
      */
 
@@ -43,7 +51,7 @@ export default  {
 
 
     /*
-     *      message
+     *      comment
      */
 
     CREATE_COMMENT (state, payload) {

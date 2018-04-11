@@ -1,4 +1,5 @@
 const apiRoot = "http://dikmachine:8000/api/";
+import webSocket from "../api.js"
 
 export default {
     
@@ -8,18 +9,26 @@ export default {
      *     
      */
 
+    // WebSocket
+    //
+    updateConnection ({ commit }, payload) {
+        commit("UPDATE_CONNECTION", payload);
+    },
+
     // @APPELMOES: Ajax spul naar api.js
 
-    fetchThreads ({ commit }) {
+    fetchThreads (store) {
 
-        $.ajax({ 
-            url: apiRoot + "threads", 
-            type: "GET", 
-            success: function (data, textStatus, jqXHR) {
-                commit("RECEIVE_THREADS", data);
-            },
-            error: () => {}
-        });
+        webSocket.send("FETCH_THREADS");
+
+        //$.ajax({ 
+        //    url: apiRoot + "threads", 
+        //    type: "GET", 
+        //    success: function (data, textStatus, jqXHR) {
+        //        commit("RECEIVE_THREADS", data);
+        //    },
+        //    error: () => {}
+        //});
 
     },
 

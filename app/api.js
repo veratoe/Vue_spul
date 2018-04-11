@@ -1,13 +1,9 @@
 import store from "./store/store.js";
 
-// we gaan ervan uit dat geen enkele mutatie bekend is bij de client
-var webSocket = new WebSocket("ws://192.168.1.21:8090");
+var webSocket = new WebSocket("ws://192.168.1.37:8090");
 
-webSocket.onopen = (evt) => { console.log("connected"); console.log(evt) };
+webSocket.onopen = (evt) => { store.dispatch('updateConnection', true); };
 webSocket.onmessage = (evt) => { 
-
-    console.log("Message received");
-    console.log(evt);
 
     var data = JSON.parse(evt.data);
 
@@ -38,6 +34,11 @@ webSocket.onmessage = (evt) => {
         case "UPDATE_USER":
             if (typeof m.changed.status !== "undefined") store.commit("TIMEOUT", m.values.status === "timeout");
             break;
+
+        case "RECEIVE_THREADS":
+            store.commit("RECEIVE_THREADS", data.payload);
     }
 
 }
+
+export default webSocket;

@@ -3,7 +3,7 @@
         <NavigationBar></NavigationBar>
         <div class="main_view">
             <ThreadList></ThreadList>
-            <ThreadView v-if="activeThreadId" :thread="getActiveThread"></ThreadView>
+            <ThreadView v-if="activeThreadId" :thread="activeThread"></ThreadView>
         </div>
     </div>
 </template>
@@ -19,11 +19,9 @@
     export default {
         name: 'App',
         components: { NavigationBar, ThreadList, ThreadView },
-        computed: Object.assign(mapGetters(['getActiveThread']), {
-            activeThreadId() {
-                return this.$store.state.activeThreadId
-            }
-        })
+        computed: {
+            ...mapGetters(['activeThread']),
+        }
     }
 
 </script>

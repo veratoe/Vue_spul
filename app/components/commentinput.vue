@@ -52,7 +52,12 @@
         position: relative;
 
         textarea {
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            outline: 0;
+            background-color: #fffdf0;
+            font-size: 11px;
+            color: #777;
             padding: 20px;
             width: 100%;
             box-sizing: border-box;
@@ -87,6 +92,7 @@
         }
 
         .characters {
+            color: #aaa;
         }
     }
 

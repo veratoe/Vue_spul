@@ -10,7 +10,8 @@ const state = {
     threads: [],
     activeThreadId: null,
     logged_in: null,
-    timeout: null
+    timeout: null,
+    connection: null
 };
 
 

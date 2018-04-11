@@ -7,7 +7,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules|server/,
-                loader: 'babel-loader'
+                loader: 'babel-loader',
             },
             {
                 test: /\.vue$/,
