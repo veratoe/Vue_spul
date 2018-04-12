@@ -3,3 +3,4 @@ node_modules/
 *.swo
 logfile
 package-lock.json
+dist/

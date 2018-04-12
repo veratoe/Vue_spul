@@ -19,9 +19,9 @@ export default  {
         state.threads = threads;
     },
 
-    RECEIVE_THREAD_MESSAGES (state, payload) {
-        var thread = state.threads.find(t => t.id === payload.threadId);
-        Vue.set(thread, 'messages', payload.messages);
+    RECEIVE_THREAD_COMMENTS (state, payload) {
+        var thread = state.threads.find(t => t.id == payload.threadId);
+        Vue.set(thread, 'comments', payload.comments);
     },
 
     RECEIVE_THREAD_SCRIPTS (state, payload) {
@@ -56,14 +56,14 @@ export default  {
 
     CREATE_COMMENT (state, payload) {
         var thread = state.threads.find(t => t.id === Number(payload.thread_id));
-        thread.messages.push(payload);
+        thread.comments.push(payload);
     },
 
-    UPDATE_MESSAGE (state, payload) {
+    UPDATE_comment (state, payload) {
         var thread = state.threads.find(t => t.id === payload.values.threadId);
-        var message = thread.messages.find(m => m.id === payload.values.id);
+        var comment = thread.comments.find(m => m.id === payload.values.id);
         for (var property in payload.changed) {
-            message[property] = payload.values[property];
+            comment[property] = payload.values[property];
         };
     },
 

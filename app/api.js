@@ -37,6 +37,9 @@ webSocket.onmessage = (evt) => {
 
         case "RECEIVE_THREADS":
             store.commit("RECEIVE_THREADS", data.payload);
+
+        case "RECEIVE_THREAD_COMMENTS":
+            store.commit("RECEIVE_THREAD_COMMENTS", data.payload);
     }
 
 }

@@ -2,11 +2,11 @@ const apiRoot = "http://dikmachine:8000/api/";
 import webSocket from "../api.js"
 
 export default {
-    
+
     /*
      *      Let op: actions moeten zo min mogelijk commits doen die eigenlijk vanuit de server
      *      kunnen worden gestuurd; laat de server leidend zijn!
-     *     
+     *
      */
 
     // WebSocket
@@ -32,14 +32,17 @@ export default {
 
     },
 
-    fetchMessages ({ commit }, payload) {
-        $.ajax({
-            url: apiRoot + "threads/" + payload + "/comments",
-            success (data, textStatus, jqXHR) {
-                console.log(data);
-                commit("RECEIVE_THREAD_MESSAGES", { threadId: payload, messages: data });
-            }
-        });
+    fetchComments ({ commit }, payload) {
+
+        webSocket.send("FETCH_THREAD_COMMENTS?thread_id=" + payload);
+
+        //$.ajax({
+        //    url: apiRoot + "threads/" + payload + "/comments",
+        //    success (data, textStatus, jqXHR) {
+        //        console.log(data);
+        //        commit("RECEIVE_THREAD_COMMENTS", { threadId: payload, comments: data });
+        //    }
+        //});
     },
 
     fetchScripts ({ commit }, payload) {
@@ -56,7 +59,7 @@ export default {
         commit("SET_ACTIVE_THREAD_ID", payload); 
     },
 
-    sendMessage ({ commit, state }, payload) {
+    sendComment ({ commit, state }, payload) {
 
         $.ajax({
             url: apiRoot + "threads/" + state.activeThreadId + "/comments",

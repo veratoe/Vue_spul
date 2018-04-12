@@ -3,7 +3,7 @@
         <NavigationBar></NavigationBar>
         <div class="main_view">
             <ThreadList></ThreadList>
-            <ThreadView v-if="activeThreadId" :thread="activeThread"></ThreadView>
+            <ThreadView v-if="activeThread" :thread="activeThread"></ThreadView>
         </div>
     </div>
 </template>

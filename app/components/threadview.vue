@@ -38,7 +38,7 @@
 
         watch: {
             thread () {
-                this.$store.dispatch('fetchcomments', this.thread.id);
+                this.$store.dispatch('fetchComments', this.thread.id);
                 this.$store.dispatch('fetchScripts', this.thread.id);
             }
 
@@ -50,8 +50,8 @@
             }
         },
         mounted () {
-            this.$store.dispatch('fetchcomments', this.thread.id);
-                this.$store.dispatch('fetchScripts', this.thread.id);
+            this.$store.dispatch('fetchComments', this.thread.id);
+            this.$store.dispatch('fetchScripts', this.thread.id);
         }
     }
 
